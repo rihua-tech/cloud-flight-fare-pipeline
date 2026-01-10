@@ -9,7 +9,7 @@ with base as (
     depart_date,
     price_usd,
     (depart_date - snapshot_date) as lead_time_days
-  from marts.fact_fares
+  from raw_marts.fact_fares
 ),
 roll as (
   select

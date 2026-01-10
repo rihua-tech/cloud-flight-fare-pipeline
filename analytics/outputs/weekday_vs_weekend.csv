@@ -1,0 +1,4 @@
+origin,dest,day_type,avg_price_usd,n
+ATL,JFK,weekend,215.00,3
+ATL,LAX,weekday,328.33,3
+SFO,JFK,weekday,297.67,3

@@ -1,0 +1,4 @@
+lead_time_bucket,origin,dest,avg_price_usd,samples
+30+,ATL,JFK,215.00,3
+30+,ATL,LAX,328.33,3
+30+,SFO,JFK,297.67,3

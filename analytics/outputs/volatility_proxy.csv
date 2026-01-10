@@ -1,0 +1,4 @@
+origin,dest,price_stddev_usd,avg_price_usd,n
+SFO,JFK,8.08,297.67,3
+ATL,LAX,6.51,328.33,3
+ATL,JFK,5.00,215.00,3
