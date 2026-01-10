@@ -46,7 +46,14 @@ docker exec -it cloud-flight-fare-pipeline-postgres-1 psql -U fare_user -d fare_
 ```
 ###### Note: profiles.yml is ignored (credentials). Use dbt/profiles.yml.example as a template and create your own local dbt/profiles.yml.
 ```
-Note: profiles.yml is ignored (credentials). Use dbt/profiles.yml.example as a template and create your own local dbt/profiles.yml.
+
+✅ Then run:
+
+```bash
+git add README.md
+git commit -m "Add Quickstart section"
+git push
+
 ```
 
 ---
