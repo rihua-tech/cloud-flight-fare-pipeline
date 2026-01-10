@@ -21,3 +21,7 @@ data/gold/
 
 .user.yml
 
+# dbt local profiles (contains credentials)
+profiles.yml
+**/profiles.yml
+
