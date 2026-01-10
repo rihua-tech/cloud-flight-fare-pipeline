@@ -6,6 +6,48 @@ An end-to-end, **Data Engineering** pipeline with an **Analytics + (optional) Da
 - **DE core:** ingest → bronze → transform → load → dbt marts → tests/docs → orchestration
 - **DA layer:** example SQL queries + ready-to-chart mart tables
 - **DS optional:** simple “Buy vs Wait” baseline model trained from mart features
+---
+
+## Quickstart (local demo in <10 minutes)
+
+### Prereqs
+- Python 3.11+
+- Docker Desktop (running)
+- dbt (installed in your venv)
+
+### 1) Clone + env
+```bash
+git clone https://github.com/rihua-tech/cloud-flight-fare-pipeline.git
+cd cloud-flight-fare-pipeline
+python -m venv .venv
+# Windows
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
+### 2) Start Postgres (Docker)
+```
+docker compose up -d
+```
+### 3) Load sample data into Postgres
+```
+python scripts/load_sample_to_postgres.py
+```
+### 4) Run dbt (staging + marts + tests)
+```
+dbt build --project-dir dbt/flight_fares --profiles-dir dbt
+```
+### 5) Run analysis queries (proof queries)
+```
+python scripts/run_analysis_queries.py
+```
+### Verify tables exist (optional)
+```
+docker exec -it cloud-flight-fare-pipeline-postgres-1 psql -U fare_user -d fare_db -c "\dt raw_marts.*"
+```
+###### Note: profiles.yml is ignored (credentials). Use dbt/profiles.yml.example as a template and create your own local dbt/profiles.yml.
+```
+Note: profiles.yml is ignored (credentials). Use dbt/profiles.yml.example as a template and create your own local dbt/profiles.yml.
+```
 
 ---
 
