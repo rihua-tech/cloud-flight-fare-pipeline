@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: fare_user
+          POSTGRES_PASSWORD: fare_pass
+          POSTGRES_DB: fare_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U fare_user -d fare_db"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - run: python -m pip install -r requirements.txt
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Unit tests
+        run: pytest -q
+
+      - name: Load demo data
+        env:
+          PGHOST: localhost
+          PGPORT: 5432
+          PGDATABASE: fare_db
+          PGUSER: fare_user
+          PGPASSWORD: fare_pass
+        run: python scripts/load_sample_to_postgres.py
+
+      - name: dbt build
+        env:
+          PGHOST: localhost
+          PGPORT: 5432
+          PGDATABASE: fare_db
+          PGUSER: fare_user
+          PGPASSWORD: fare_pass
+        run: |
+          mkdir -p ~/.dbt
+          cp dbt/flight_fares/profiles.yml.example ~/.dbt/profiles.yml
+          cd dbt/flight_fares
+          dbt deps
+          dbt build

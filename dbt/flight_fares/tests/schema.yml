@@ -1,0 +1,44 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: fares
+        freshness:
+          warn_after: {count: 2, period: day}
+          error_after: {count: 7, period: day}
+        loaded_at_field: scrape_ts
+
+models:
+  - name: stg_fares
+    columns:
+      - name: snapshot_date
+        tests: [not_null]
+      - name: origin
+        tests: [not_null]
+      - name: dest
+        tests: [not_null]
+      - name: price_usd
+        tests: [not_null]
+
+  - name: dim_route
+    columns:
+      - name: route_key
+        tests: [unique, not_null]
+
+  - name: dim_date
+    columns:
+      - name: date_day
+        tests: [unique, not_null]
+
+  - name: fact_fares
+    columns:
+      - name: date_day
+        tests: [not_null]
+      - name: origin
+        tests: [not_null]
+      - name: dest
+        tests: [not_null]
+      - name: price_usd
+        tests: [not_null]

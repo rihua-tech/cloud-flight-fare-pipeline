@@ -1,0 +1,9 @@
+[project]
+name = "cloud-flight-fare-pipeline"
+version = "0.1.0"
+description = "Cloud Flight Fare Pipeline (AWS, Airflow, dbt, Redshift) - starter skeleton"
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.ruff]
+line-length = 100

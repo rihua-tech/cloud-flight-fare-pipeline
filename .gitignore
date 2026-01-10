@@ -1,0 +1,23 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.DS_Store
+.idea/
+.vscode/
+target/
+dbt_packages/
+logs/
+*.log
+
+# Generated data
+data/bronze/
+data/silver/
+data/gold/
+.env.*
+
+
+.user.yml
+

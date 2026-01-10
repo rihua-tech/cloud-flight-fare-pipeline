@@ -1,0 +1,22 @@
+# Core
+requests>=2.31.0
+python-dotenv>=1.0.1
+pandas>=2.2.0
+
+# Local warehouse + scripts
+SQLAlchemy>=2.0.0
+psycopg2-binary>=2.9.0
+
+# AWS (optional)
+boto3>=1.34.0
+
+# dbt (local demo uses Postgres; prod can add dbt-redshift if desired)
+dbt-core>=1.7.0
+dbt-postgres>=1.7.0
+
+# DS optional
+scikit-learn>=1.4.0
+
+# Dev
+ruff>=0.5.0
+pytest>=8.0.0
