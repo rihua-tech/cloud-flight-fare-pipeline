@@ -18,6 +18,8 @@ data/silver/
 data/gold/
 .env.*
 
+analytics/outputs/
+
 
 .user.yml
 
