@@ -1,5 +1,8 @@
 .env
 .venv/
+.env.*
+!.env.example
+
 __pycache__/
 *.pyc
 .pytest_cache/
@@ -11,6 +14,7 @@ target/
 dbt_packages/
 logs/
 *.log
+
 
 # Generated data
 data/bronze/
