@@ -133,6 +133,34 @@ python ml/train_buy_wait.py
 
 ---
 
+## Week 3 — S3 Bronze Ingestion ✅
+
+This step ingests daily fare snapshots and writes them to S3 in **bronze** partitioned folders.
+
+### Command I ran (3 days)
+```bash
+python -m ingestion.ingest_api_to_s3 --start 2026-01-17 --days 3 --to-s3
+```
+
+### S3 path convention
+```text
+s3://cloud-flight-fare-pipeline-rihua-2026/bronze/flights/dt=YYYY-MM-DD/fares.jsonl
+```
+
+✅ Real examples (3 days):
+- `s3://cloud-flight-fare-pipeline-rihua-2026/bronze/flights/dt=2026-01-17/fares.jsonl`
+- `s3://cloud-flight-fare-pipeline-rihua-2026/bronze/flights/dt=2026-01-18/fares.jsonl`
+- `s3://cloud-flight-fare-pipeline-rihua-2026/bronze/flights/dt=2026-01-19/fares.jsonl`
+
+### Evidence (screenshots)
+
+**Terminal output**
+![Terminal upload](docs/screenshots/week3/terminal-upload.png)
+
+**S3 console folders**
+![S3 console](docs/screenshots/week3/s3-console.png)
+
+
 ## What recruiters should look at (fast)
 - **DE:** `ingestion/`, `warehouse/`, `dbt/`, `sql/redshift/`, `ci/`
 - **DA:** `dbt/…/marts/` + `sql/analysis/` + `analytics/`
