@@ -3,6 +3,7 @@
 Use:
 - `sql/redshift/create_schemas.sql`
 - `sql/redshift/copy_commands.sql`
+- `sql/redshift/verify_marts.sql` (proof row counts after dbt)
 
 In MWAA / job container:
 1) Create schemas/tables

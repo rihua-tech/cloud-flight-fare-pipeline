@@ -22,7 +22,7 @@ def pg_url() -> str:
     port = os.getenv("PGPORT", "5432")
     db = os.getenv("PGDATABASE", "fare_db")
     user = os.getenv("PGUSER", "fare_user")
-    pwd = os.getenv("PGPASSWORD", "fare_pass")
+    pwd = os.getenv("PGPASSWORD", "")
     return f"postgresql+psycopg2://{user}:{pwd}@{host}:{port}/{db}"
 
 DDL = """create schema if not exists raw;

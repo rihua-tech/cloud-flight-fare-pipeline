@@ -5,8 +5,9 @@
 docker compose up -d postgres
 pip install -r requirements.txt
 python scripts/load_sample_to_postgres.py
-cp dbt/flight_fares/profiles.yml.example ~/.dbt/profiles.yml
-cd dbt/flight_fares && dbt deps && dbt build
+cp dbt/profiles.example.yml dbt/profiles.yml
+dbt deps --project-dir dbt/flight_fares --profiles-dir dbt
+dbt build --project-dir dbt/flight_fares --profiles-dir dbt
 python scripts/run_analysis_queries.py
 ```
 

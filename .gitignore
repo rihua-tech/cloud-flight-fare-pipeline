@@ -28,6 +28,6 @@ analytics/outputs/
 .user.yml
 
 # dbt local profiles (contains credentials)
+dbt/profiles.yml
 profiles.yml
 **/profiles.yml
-

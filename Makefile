@@ -15,7 +15,7 @@ load:
 	python scripts/load_sample_to_postgres.py
 
 dbt-build:
-	cp dbt/flight_fares/profiles.yml.example ~/.dbt/profiles.yml
+	cp dbt/profiles.example.yml ~/.dbt/profiles.yml
 	cd dbt/flight_fares && dbt deps && dbt build
 
 analyze:

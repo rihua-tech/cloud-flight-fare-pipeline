@@ -42,9 +42,9 @@ python scripts/run_analysis_queries.py
 ```
 ### Verify tables exist (optional)
 ```
-docker exec -it cloud-flight-fare-pipeline-postgres-1 psql -U fare_user -d fare_db -c "\dt raw_marts.*"
+docker exec -it cloud-flight-fare-pipeline-postgres-1 psql -U fare_user -d fare_db -c "\dt marts.*"
 ```
-###### Note: profiles.yml is ignored (credentials). Use dbt/profiles.yml.example as a template and create your own local dbt/profiles.yml.
+###### Note: profiles.yml is ignored (credentials). Use `dbt/profiles.example.yml` as a template and create your own local `dbt/profiles.yml`.
 ```
 
 ✅ Then run:
@@ -105,10 +105,9 @@ python scripts/load_sample_to_postgres.py
 
 ### 2) Run dbt build (models + tests)
 ```bash
-cp dbt/flight_fares/profiles.yml.example ~/.dbt/profiles.yml
-cd dbt/flight_fares
-dbt deps
-dbt build
+cp dbt/profiles.example.yml dbt/profiles.yml
+dbt deps --project-dir dbt/flight_fares --profiles-dir dbt
+dbt build --project-dir dbt/flight_fares --profiles-dir dbt
 ```
 
 ### 3) Run example analytics queries
@@ -125,11 +124,28 @@ python ml/train_buy_wait.py
 
 ## Production notes (AWS/Redshift)
 - Redshift DDL/COPY templates: `sql/redshift/`
+- Redshift dbt target setup (example only): `warehouse/redshift_dbt.md`
+- Proof row counts after dbt: `sql/redshift/verify_marts.sql`
 - Airflow DAG outline: `airflow/dags/flight_fare_pipeline_dag.py`
 - Replace the local demo loader with:
   - API → S3 ingestion
   - Redshift COPY from S3
   - dbt runs in a job container / MWAA
+
+---
+
+## Week 4 - Run on AWS (S3 -> Redshift -> dbt)
+1) Set env vars (see `.env.example`)
+2) Copy the dbt profile:
+   `cp dbt/profiles.example.yml dbt/profiles.yml`
+3) Run warehouse SQL (schemas + COPY):
+   `python warehouse/run_redshift_sql.py`
+4) Run dbt:
+   `dbt build --project-dir dbt/flight_fares --profiles-dir dbt --target redshift`
+5) Proof queries:
+   `sql/redshift/verify_marts.sql`
+
+See `docs/week4_redshift_runbook.md` for full steps.
 
 ---
 

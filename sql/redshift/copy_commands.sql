@@ -1,17 +1,18 @@
--- Redshift COPY templates (fill your IAM role + S3 path)
+-- Redshift COPY template (replace placeholders or use env vars)
+-- Required placeholders: {{S3_BUCKET}}, {{S3_PREFIX}}, {{IAM_ROLE_ARN}}, {{REDSHIFT_SCHEMA_RAW}}
+-- S3_PREFIX should include the partition path (example: bronze/flights/dt=YYYY-MM-DD)
 
--- 1) COPY JSONL (one JSON object per line)
--- copy raw.fares
--- from 's3://<bucket>/bronze/flights/dt=2026-01-01/fares.jsonl'
--- iam_role 'arn:aws:iam::<account>:role/<RedshiftCopyRole>'
--- format as json 'auto'
--- timeformat 'auto'
--- truncatecolumns
--- blanksasnull
--- emptyasnull;
+copy {{REDSHIFT_SCHEMA_RAW}}.fares
+from 's3://{{S3_BUCKET}}/{{S3_PREFIX}}/fares.jsonl'
+iam_role '{{IAM_ROLE_ARN}}'
+format as json 'auto'
+timeformat 'auto'
+truncatecolumns
+blanksasnull
+emptyasnull;
 
--- 2) COPY Parquet (recommended for performance)
--- copy raw.fares
--- from 's3://<bucket>/silver/flights/dt=2026-01-01/'
--- iam_role 'arn:aws:iam::<account>:role/<RedshiftCopyRole>'
+-- Parquet alternative (commented)
+-- copy {{REDSHIFT_SCHEMA_RAW}}.fares
+-- from 's3://{{S3_BUCKET}}/{{S3_PREFIX}}/'
+-- iam_role '{{IAM_ROLE_ARN}}'
 -- format as parquet;
