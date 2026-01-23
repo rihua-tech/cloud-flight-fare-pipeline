@@ -33,4 +33,7 @@ Do not commit secrets. Keep `.env` local and use `.env.example` for defaults.
 
 ## Part A Proof (Postgres local)
 
-![Postgres raw.fares proof](screenshots/week4/week4_partA_postgres_raw_fares_proof_2026-01-22.png)
+![A5 Postgres raw.fares proof](screenshots/week4/week4_partA_postgres_raw_fares_proof_2026-01-22.png)
+
+![A6 dbt debug + build success](../docs/screenshots/week4/week4_A6_dbt_pg_debug_build_success_2026-01-22.png)
+
