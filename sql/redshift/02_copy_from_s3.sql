@@ -1,10 +1,13 @@
-copy raw.fares
-from 's3://YOUR_BUCKET/bronze/dt=YYYY-MM-DD/fares.csv'
-iam_role 'YOUR_REDSHIFT_COPY_ROLE_ARN'
+
+copy "raw".fares
+
+from 's3://cloud-flight-fare-pipeline-rihua-2026-east1/bronze/dt=2026-01-23/fares.csv'
+iam_role 'arn:aws:iam::183047399603:role/RedshiftCopyRole'
 csv
 ignoreheader 1
 timeformat 'auto'
 dateformat 'auto'
+region 'us-east-1'
 blanksasnull
 emptyasnull
 acceptinvchars;

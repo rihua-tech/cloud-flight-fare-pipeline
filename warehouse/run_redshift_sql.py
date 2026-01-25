@@ -17,8 +17,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SQL_FILES = [
-    ROOT / "sql" / "redshift" / "create_schemas.sql",
-    ROOT / "sql" / "redshift" / "copy_commands.sql",
+    ROOT / "sql" / "redshift" / "00_reset_schemas.sql",
+    ROOT / "sql" / "redshift" / "01_create_raw_table.sql",
+    ROOT / "sql" / "redshift" / "02_copy_from_s3.sql",
 ]
 
 
@@ -100,7 +101,10 @@ def build_arg_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--files",
         nargs="*",
-        help="Optional list of SQL filenames to run (default runs create_schemas.sql + copy_commands.sql).",
+        help=(
+            "Optional list of SQL filenames to run (default runs 00_reset_schemas.sql + "
+            "01_create_raw_table.sql + 02_copy_from_s3.sql)."
+        ),
     )
     return p
 

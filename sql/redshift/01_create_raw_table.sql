@@ -1,6 +1,6 @@
-drop table if exists raw.fares;
+drop table if exists "raw".fares;
 
-create table raw.fares (
+create table "raw".fares (
   snapshot_date date,
   origin varchar(8),
   dest varchar(8),
@@ -11,3 +11,4 @@ create table raw.fares (
   trip_class int,
   number_of_changes int
 );
+

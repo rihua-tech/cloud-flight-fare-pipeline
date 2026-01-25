@@ -26,10 +26,17 @@ S3_PREFIX=bronze/flights/dt=YYYY-MM-DD
 IAM_ROLE_ARN=
 ```
 
+Note: dbt does not load `.env` automatically. If you keep these in `.env`,
+use the PowerShell helper when running dbt:
+```powershell
+.\scripts\dbt.ps1 build --project-dir dbt/flight_fares --profiles-dir dbt --target redshift
+```
+
 ## 3) Create schemas/tables
 Run the templates in:
-- `sql/redshift/create_schemas.sql`
-- `sql/redshift/copy_commands.sql` (load `raw.fares`)
+- `sql/redshift/00_reset_schemas.sql`
+- `sql/redshift/01_create_raw_table.sql`
+- `sql/redshift/02_copy_from_s3.sql` (load `raw.fares`)
 
 Or use the helper:
 ```bash

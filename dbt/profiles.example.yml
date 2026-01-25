@@ -1,15 +1,19 @@
+
+
 flight_fares:
-  target: dev
+  target: pg_warehouse
   outputs:
-    dev:
+
+    pg_warehouse:
       type: postgres
       host: "{{ env_var('PGHOST', 'localhost') }}"
       user: "{{ env_var('PGUSER', 'fare_user') }}"
-      password: "{{ env_var('PGPASSWORD') }}"
+      password: "{{ env_var('PGPASSWORD', '') }}"
       port: "{{ env_var('PGPORT', '5432') | int }}"
       dbname: "{{ env_var('PGDATABASE', 'fare_db') }}"
       schema: raw
       threads: 4
+
     redshift:
       type: redshift
       host: "{{ env_var('REDSHIFT_HOST') }}"
@@ -17,6 +21,6 @@ flight_fares:
       password: "{{ env_var('REDSHIFT_PASSWORD') }}"
       port: "{{ env_var('REDSHIFT_PORT', '5439') | int }}"
       dbname: "{{ env_var('REDSHIFT_DBNAME', 'dev') }}"
-      schema: "{{ env_var('REDSHIFT_SCHEMA_RAW', 'raw') }}"
+      schema: staging
       threads: 4
       sslmode: prefer
