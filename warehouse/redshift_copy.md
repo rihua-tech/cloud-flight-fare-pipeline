@@ -1,8 +1,10 @@
 # Redshift load (template)
 
 Use:
-- `sql/redshift/create_schemas.sql`
-- `sql/redshift/copy_commands.sql`
+- `sql/redshift/00_reset_schemas.sql`
+- `sql/redshift/01_create_raw_table.sql`
+- `sql/redshift/02_copy_from_s3.sql`
+- `sql/redshift/verify_marts.sql` (proof row counts after dbt)
 
 In MWAA / job container:
 1) Create schemas/tables

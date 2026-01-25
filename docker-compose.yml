@@ -3,11 +3,14 @@ services:
     image: postgres:16
     environment:
       POSTGRES_USER: fare_user
-      POSTGRES_PASSWORD: fare_pass
+      POSTGRES_PASSWORD: ${PGPASSWORD}
       POSTGRES_DB: fare_db
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./sql:/sql
+      - ./data:/data
+
 volumes:
   pgdata: {}

@@ -11,7 +11,7 @@ select
   dest,
   round(avg(price_usd)::numeric, 2) as avg_price_usd,
   count(*) as samples
-from raw_marts.fact_fares
+from marts.fact_fares
 group by 1,2,3
 order by 1,2,3
 limit 50;
