@@ -173,6 +173,19 @@ s3://<bucket>/bronze/dt=YYYY-MM-DD/fares.csv
 - **DA:** `dbt/…/marts/` + `sql/analysis/` + `analytics/`
 - **DS:** `ml/` + feature query in `sql/analysis/buy_wait_features.sql`
 
+##  Week 4 — Warehouse target
+
+**Option A (Local demo): Postgres “warehouse mode”**
+1) docker compose up -d
+2) python scripts/load_sample_to_postgres.py (or the psql files if you keep that method)
+3) dbt build -t pg_warehouse
+4) Link: warehouse/postgres_local.md (or docs/...)
+
+**Option B (AWS): S3 → Redshift Serverless → dbt**
+1) python warehouse/run_redshift_sql.py
+2) dbt debug -t redshift
+3) dbt build -t redshift
+4) Link: docs/week4_redshift_runbook.md
 
 ## Week 4 — Warehouse target (S3 → Redshift Serverless → dbt) ✅
 
