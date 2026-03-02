@@ -1,0 +1,116 @@
+services:
+  airflow-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - airflow_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow -d airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+
+  airflow-init:
+    build:
+      context: ..
+      dockerfile: airflow/Dockerfile
+    depends_on:
+      airflow-db:
+        condition: service_healthy
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__WEBSERVER__SECRET_KEY: "airflow-week5-shared-secret"
+      PGHOST: host.docker.internal
+      PGPORT: "5432"
+      PGDATABASE: fare_db
+      PGUSER: fare_user
+      PGPASSWORD: fare_pass
+    volumes:
+      - ../airflow/dags:/opt/airflow/dags
+      - ../:/opt/airflow/project
+      - airflow_logs:/opt/airflow/logs
+    command: >
+      bash -c "
+      airflow db migrate &&
+      airflow users create
+        --username rihua
+        --password MyStrongPass123
+        --firstname Rihua
+        --lastname VanSteenburgh
+        --role Admin
+        --email rihua@example.com || true
+      "
+    restart: "no"
+    
+
+  airflow-webserver:
+    build:
+      context: ..
+      dockerfile: airflow/Dockerfile
+    depends_on:
+      airflow-db:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "False"
+      AIRFLOW__LOGGING__LOGGING_LEVEL: INFO
+      AIRFLOW__WEBSERVER__SECRET_KEY: "airflow-week5-shared-secret"
+      PGHOST: host.docker.internal
+      PGPORT: "5432"
+      PGDATABASE: fare_db
+      PGUSER: fare_user
+      PGPASSWORD: fare_pass
+      AIRFLOW__WEBSERVER__BASE_URL: http://localhost:8080
+      AIRFLOW__LOGGING__BASE_URL: http://airflow-webserver:8080
+    volumes:
+      - ../airflow/dags:/opt/airflow/dags
+      - ../:/opt/airflow/project
+      - airflow_logs:/opt/airflow/logs
+    ports:
+      - "8080:8080"
+    command: webserver
+    restart: unless-stopped
+
+  airflow-scheduler:
+    build:
+      context: ..
+      dockerfile: airflow/Dockerfile
+    depends_on:
+      airflow-db:
+        condition: service_healthy
+      airflow-init:
+        condition: service_completed_successfully
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__LOGGING__LOGGING_LEVEL: INFO
+      AIRFLOW__WEBSERVER__SECRET_KEY: "airflow-week5-shared-secret"
+      PGHOST: host.docker.internal
+      PGPORT: "5432"
+      PGDATABASE: fare_db
+      PGUSER: fare_user
+      PGPASSWORD: fare_pass
+      AIRFLOW__LOGGING__BASE_URL: http://airflow-webserver:8080
+    volumes:
+      - ../airflow/dags:/opt/airflow/dags
+      - ../:/opt/airflow/project
+      - airflow_logs:/opt/airflow/logs
+    command: scheduler
+    restart: unless-stopped
+
+volumes:
+  airflow_db:
+  airflow_logs:
