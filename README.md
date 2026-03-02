@@ -223,3 +223,57 @@ See `docs/week4_redshift_runbook.md` for full steps + “no secrets committed”
 
 
 ---
+
+## Week 5 — Orchestration (Airflow, Local)
+
+Implemented a local Airflow orchestration demo for the **Cloud Flight Fare Pipeline** to satisfy the Week 5 requirement: **scheduled runs + retries + logs**.
+
+### DAG implemented
+
+**DAG ID:** `flight_fare_pipeline_local_demo`
+**Schedule:** `@daily`
+**Retries:** `2` (with `retry_delay=3 minutes`)
+**Catchup:** `False`
+
+### Task flow (end-to-end)
+
+1. `load_sample_to_postgres` — loads sample fare data into local Postgres
+2. `dbt_build` — runs `dbt deps` and `dbt build` (models + tests)
+3. `run_analysis_queries` — runs proof/analysis SQL queries
+
+### Run locally (Week 5 demo)
+
+From the repo root:
+
+```bash
+# Start project Postgres (warehouse demo)
+docker compose up -d
+
+# Start Airflow services (webserver + scheduler + init)
+docker compose -f airflow/docker-compose.airflow.yml up -d --build
+```
+
+Open Airflow UI:
+
+* `http://localhost:8080`
+
+### Logs and rerun behavior proof
+
+* Task logs are captured in the **Airflow UI** (Task → Logs)
+* Rerun behavior was validated using **Clear and Retry** on a successful task (`run_analysis_queries`) in Graph view
+
+### Week 5 screenshots
+
+Saved under:
+
+* `docs/screenshots/week5/`
+
+Included proof:
+
+* DAG list page
+* Graph view (3 tasks connected)
+* Task log output (`dbt_build`) with success
+* Rerun proof (`Clear and Retry` dialog + rerun success)
+
+---
+
