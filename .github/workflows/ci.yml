@@ -14,7 +14,7 @@ jobs:
         image: postgres:16
         env:
           POSTGRES_USER: fare_user
-          POSTGRES_PASSWORD: ${{ secrets.PGPASSWORD }}
+          POSTGRES_PASSWORD: ci_test_password
           POSTGRES_DB: fare_db
         ports:
           - 5432:5432
@@ -45,7 +45,7 @@ jobs:
           PGPORT: 5432
           PGDATABASE: fare_db
           PGUSER: fare_user
-          PGPASSWORD: ${{ secrets.PGPASSWORD }}
+          PGPASSWORD: ci_test_password
         run: python scripts/load_sample_to_postgres.py
 
       - name: dbt build
@@ -54,7 +54,7 @@ jobs:
           PGPORT: 5432
           PGDATABASE: fare_db
           PGUSER: fare_user
-          PGPASSWORD: ${{ secrets.PGPASSWORD }}
+          PGPASSWORD: ci_test_password
         run: |
           mkdir -p ~/.dbt
           cp dbt/profiles.example.yml ~/.dbt/profiles.yml
