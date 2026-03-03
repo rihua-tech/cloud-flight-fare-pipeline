@@ -2,13 +2,13 @@ services:
   airflow-db:
     image: postgres:15
     environment:
-      POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: airflow
-      POSTGRES_DB: airflow
+      POSTGRES_USER: ${AIRFLOW_DB_USER:-airflow}
+      POSTGRES_PASSWORD: ${AIRFLOW_DB_PASSWORD}
+      POSTGRES_DB: ${AIRFLOW_DB_NAME:-airflow}
     volumes:
       - airflow_db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U airflow -d airflow"]
+      test: ["CMD-SHELL", "pg_isready -U ${AIRFLOW_DB_USER:-airflow} -d ${AIRFLOW_DB_NAME:-airflow}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -24,14 +24,19 @@ services:
         condition: service_healthy
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_DB_USER:-airflow}:${AIRFLOW_DB_PASSWORD}@airflow-db:5432/${AIRFLOW_DB_NAME:-airflow}
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
-      AIRFLOW__WEBSERVER__SECRET_KEY: "airflow-week5-shared-secret"
-      PGHOST: host.docker.internal
-      PGPORT: "5432"
-      PGDATABASE: fare_db
-      PGUSER: fare_user
-      PGPASSWORD: fare_pass
+      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_WEBSERVER_SECRET_KEY}
+      PGHOST: ${PGHOST:-host.docker.internal}
+      PGPORT: "${PGPORT:-5432}"
+      PGDATABASE: ${PGDATABASE:-fare_db}
+      PGUSER: ${PGUSER:-fare_user}
+      PGPASSWORD: ${PGPASSWORD}
+      AIRFLOW_ADMIN_USERNAME: ${AIRFLOW_ADMIN_USERNAME:-admin}
+      AIRFLOW_ADMIN_PASSWORD: ${AIRFLOW_ADMIN_PASSWORD}
+      AIRFLOW_ADMIN_FIRSTNAME: ${AIRFLOW_ADMIN_FIRSTNAME:-Airflow}
+      AIRFLOW_ADMIN_LASTNAME: ${AIRFLOW_ADMIN_LASTNAME:-Admin}
+      AIRFLOW_ADMIN_EMAIL: ${AIRFLOW_ADMIN_EMAIL:-admin@example.com}
     volumes:
       - ../airflow/dags:/opt/airflow/dags
       - ../:/opt/airflow/project
@@ -40,12 +45,12 @@ services:
       bash -c "
       airflow db migrate &&
       airflow users create
-        --username rihua
-        --password MyStrongPass123
-        --firstname Rihua
-        --lastname VanSteenburgh
+        --username ${AIRFLOW_ADMIN_USERNAME}
+        --password ${AIRFLOW_ADMIN_PASSWORD}
+        --firstname ${AIRFLOW_ADMIN_FIRSTNAME:-Admin}
+        --lastname ${AIRFLOW_ADMIN_LASTNAME:-User}
         --role Admin
-        --email rihua@example.com || true
+        --email ${AIRFLOW_ADMIN_EMAIL:-admin@example.com} || true
       "
     restart: "no"
     
@@ -61,17 +66,17 @@ services:
         condition: service_completed_successfully
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_DB_USER:-airflow}:${AIRFLOW_DB_PASSWORD}@airflow-db:5432/${AIRFLOW_DB_NAME:-airflow}
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
       AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "True"
       AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "False"
       AIRFLOW__LOGGING__LOGGING_LEVEL: INFO
-      AIRFLOW__WEBSERVER__SECRET_KEY: "airflow-week5-shared-secret"
-      PGHOST: host.docker.internal
-      PGPORT: "5432"
-      PGDATABASE: fare_db
-      PGUSER: fare_user
-      PGPASSWORD: fare_pass
+      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_WEBSERVER_SECRET_KEY}
+      PGHOST: ${PGHOST:-host.docker.internal}
+      PGPORT: "${PGPORT:-5432}"
+      PGDATABASE: ${PGDATABASE:-fare_db}
+      PGUSER: ${PGUSER:-fare_user}
+      PGPASSWORD: ${PGPASSWORD}
       AIRFLOW__WEBSERVER__BASE_URL: http://localhost:8080
       AIRFLOW__LOGGING__BASE_URL: http://airflow-webserver:8080
     volumes:
@@ -94,15 +99,15 @@ services:
         condition: service_completed_successfully
     environment:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db:5432/airflow
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${AIRFLOW_DB_USER:-airflow}:${AIRFLOW_DB_PASSWORD}@airflow-db:5432/${AIRFLOW_DB_NAME:-airflow}
       AIRFLOW__CORE__LOAD_EXAMPLES: "False"
       AIRFLOW__LOGGING__LOGGING_LEVEL: INFO
-      AIRFLOW__WEBSERVER__SECRET_KEY: "airflow-week5-shared-secret"
-      PGHOST: host.docker.internal
-      PGPORT: "5432"
-      PGDATABASE: fare_db
-      PGUSER: fare_user
-      PGPASSWORD: fare_pass
+      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_WEBSERVER_SECRET_KEY}
+      PGHOST: ${PGHOST:-host.docker.internal}
+      PGPORT: "${PGPORT:-5432}"
+      PGDATABASE: ${PGDATABASE:-fare_db}
+      PGUSER: ${PGUSER:-fare_user}
+      PGPASSWORD: ${PGPASSWORD}
       AIRFLOW__LOGGING__BASE_URL: http://airflow-webserver:8080
     volumes:
       - ../airflow/dags:/opt/airflow/dags

@@ -1,4 +1,6 @@
 # Cloud Flight Fare Pipeline
+[![CI](https://github.com/rihua-tech/cloud-flight-fare-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/rihua-tech/cloud-flight-fare-pipeline/actions/workflows/ci.yml)
+
 **AWS • Airflow • Python • SQL • dbt • Redshift (prod) • Postgres (local demo)**
 
 An end-to-end, **Data Engineering** pipeline with an **Analytics + (optional) Data Science** layer.
@@ -173,7 +175,7 @@ s3://<bucket>/bronze/dt=YYYY-MM-DD/fares.csv
 - **DA:** `dbt/…/marts/` + `sql/analysis/` + `analytics/`
 - **DS:** `ml/` + feature query in `sql/analysis/buy_wait_features.sql`
 
-##  Week 4 — Warehouse target
+## Week 4 — Warehouse Target (Summary)
 
 **Option A (Local demo): Postgres “warehouse mode”**
 1) docker compose up -d
@@ -274,6 +276,120 @@ Included proof:
 * Graph view (3 tasks connected)
 * Task log output (`dbt_build`) with success
 * Rerun proof (`Clear and Retry` dialog + rerun success)
+
+---
+
+## Week 6 — Documentation & Analytics Handoff
+
+Portfolio handoff for reviewers: this section summarizes how to run and validate the pipeline.
+Detailed implementation evidence remains in Weeks 3-5 above.
+
+### Architecture
+
+Detailed architecture: [docs/architecture.md](docs/architecture.md).
+
+End-to-end flow:
+1. Ingest fare snapshots to S3 bronze (or local demo input)
+2. Transform raw records into curated warehouse-ready data
+3. Load warehouse tables (local Postgres or AWS Redshift)
+4. Build dbt marts for analytics consumption
+5. Serve analytics queries and dashboard outputs
+
+Core marts in this repo:
+- `marts.fact_fares`
+- `marts.dim_route`
+- `marts.dim_date`
+
+### Running Locally
+
+Use this fast local path:
+
+```bash
+docker compose up -d
+python scripts/load_sample_to_postgres.py
+dbt build --project-dir dbt/flight_fares --profiles-dir dbt
+python scripts/run_analysis_queries.py
+```
+
+For full setup context, see **Quickstart** and **Local demo (runs without AWS)** above.
+
+### Running on AWS
+
+AWS execution path (S3 + Redshift + dbt):
+
+```bash
+python warehouse/run_redshift_sql.py --dry-run
+python warehouse/run_redshift_sql.py
+dbt build --project-dir dbt/flight_fares --profiles-dir dbt -t redshift
+```
+
+For full production steps, see **Production notes (AWS/Redshift)** and `docs/week4_redshift_runbook.md`.
+
+### Testing & CI
+
+CI is automated with **GitHub Actions** in `.github/workflows/ci.yml` on pushes to `main` and pull requests.
+
+Pipeline checks include:
+- `ruff check .`
+- `pytest -q`
+- demo data load: `python scripts/load_sample_to_postgres.py`
+- dbt validation: `dbt deps` + `dbt build`
+
+### Example Queries & Outputs
+
+Representative analytics queries run on the mart layer:
+
+```sql
+select
+  origin || '-' || dest as route,
+  avg(price_usd) as avg_price_usd
+from marts.fact_fares
+group by 1
+order by avg_price_usd asc
+limit 10;
+```
+
+```sql
+select
+  d.year,
+  d.month,
+  avg(f.price_usd) as monthly_avg_price_usd
+from marts.fact_fares f
+join marts.dim_date d on f.date_day = d.date_day
+group by 1, 2
+order by 1, 2;
+```
+
+Expected output categories:
+- route-level fare trends
+- monthly fare movement
+- lead-time and weekday/weekend comparisons
+
+Reference query sets:
+- `sql/examples/`
+- `sql/analysis/`
+
+Sample materialized outputs:
+- `analytics/outputs/`
+
+### Analytics-ready Output (Week 6)
+
+Week 6 deliverable is an analytics-ready mart layer for BI, ad-hoc SQL, and downstream modeling.
+
+Primary output tables:
+- `marts.fact_fares` (observed fare records with lead-time context)
+- `marts.dim_route` (route dimension: origin, destination, route key)
+- `marts.dim_date` (calendar dimension by snapshot date)
+
+Supporting documentation:
+- `docs/how_to_use_marts.md`
+- `docs/data_dictionary.md`
+- `docs/kpi_definitions.md`
+
+Dashboard preview artifact:
+- [docs/images/dashboard_screenshot.png](docs/images/dashboard_screenshot.png)
+
+![Dashboard screenshot](docs/images/dashboard_screenshot.png)
 
 ---
 
