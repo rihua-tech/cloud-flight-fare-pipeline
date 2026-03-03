@@ -1,4 +1,12 @@
 # Cloud Flight Fare Pipeline
+
+## Architecture Overview
+
+![Pipeline Architecture](docs/images/pipeline_architecture.png)
+
+End-to-end data pipeline architecture showing ingestion,
+raw storage, transformation with dbt, and analytics outputs.
+
 [![CI](https://github.com/rihua-tech/cloud-flight-fare-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/rihua-tech/cloud-flight-fare-pipeline/actions/workflows/ci.yml)
 
 **AWS • Airflow • Python • SQL • dbt • Redshift (prod) • Postgres (local demo)**
