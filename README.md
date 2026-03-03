@@ -1,4 +1,16 @@
 # Cloud Flight Fare Pipeline
+[![CI](https://github.com/rihua-tech/cloud-flight-fare-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/rihua-tech/cloud-flight-fare-pipeline/actions/workflows/ci.yml)
+
+## Contents
+- [Architecture Overview](#architecture-overview)
+- [Project Overview](#project-overview)
+- [Quickstart](#quickstart-local-demo-in-10-minutes)
+- [Architecture](#architecture-high-level)
+- [Repo Structure](#repo-structure)
+- [Local Demo](#local-demo-runs-without-aws)
+- [Production](#production-notes-awsredshift)
+- [Analytics-ready Output (Week 6)](#analytics-ready-output-week-6)
+- [Dashboard Preview](#dashboard-preview-artifact)
 
 ## Architecture Overview
 
@@ -7,7 +19,11 @@
 End-to-end data pipeline architecture showing ingestion,
 raw storage, transformation with dbt, and analytics outputs.
 
-[![CI](https://github.com/rihua-tech/cloud-flight-fare-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/rihua-tech/cloud-flight-fare-pipeline/actions/workflows/ci.yml)
+## Project Overview
+
+This project demonstrates an end-to-end data engineering pipeline for collecting, staging, transforming, and analyzing airline fare data. It supports a fast **local demo environment** (Docker + Postgres) and a **production-style architecture** (AWS S3 + Redshift) orchestrated with Airflow and modeled with dbt.
+
+Outputs include analytics-ready mart tables and example queries that support BI dashboards and pricing analysis workflows.
 
 **AWS • Airflow • Python • SQL • dbt • Redshift (prod) • Postgres (local demo)**
 
@@ -18,7 +34,7 @@ An end-to-end, **Data Engineering** pipeline with an **Analytics + (optional) Da
 - **DS optional:** simple “Buy vs Wait” baseline model trained from mart features
 ---
 
-## Quickstart (local demo in <10 minutes)
+## Quickstart (Local Demo in 10 Minutes)
 
 ### Prereqs
 - Python 3.11+
@@ -394,7 +410,7 @@ Supporting documentation:
 - `docs/data_dictionary.md`
 - `docs/kpi_definitions.md`
 
-Dashboard preview artifact:
+### Dashboard Preview Artifact
 - [docs/images/dashboard_screenshot.png](docs/images/dashboard_screenshot.png)
 
 ![Dashboard screenshot](docs/images/dashboard_screenshot.png)
