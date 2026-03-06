@@ -1,8 +1,6 @@
-
 copy "raw".fares
-
-from 's3://cloud-flight-fare-pipeline-rihua-2026-east1/bronze/dt=2026-01-23/fares.csv'
-iam_role 'arn:aws:iam::183047399603:role/RedshiftCopyRole'
+from 's3://{{S3_BUCKET}}/{{S3_PREFIX}}/fares.csv'
+iam_role '{{IAM_ROLE_ARN}}'
 csv
 ignoreheader 1
 timeformat 'auto'

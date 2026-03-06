@@ -22,15 +22,11 @@ REDSHIFT_PASSWORD=
 REDSHIFT_SCHEMA_RAW=raw
 
 S3_BUCKET=
-S3_PREFIX=bronze/flights/dt=YYYY-MM-DD
+S3_PREFIX=bronze/dt=YYYY-MM-DD
 IAM_ROLE_ARN=
 ```
 
-Note: dbt does not load `.env` automatically. If you keep these in `.env`,
-use the PowerShell helper when running dbt:
-```powershell
-.\scripts\dbt.ps1 build --project-dir dbt/flight_fares --profiles-dir dbt --target redshift
-```
+Note: dbt does not load `.env` automatically. Export env vars in your shell before running dbt.
 
 ## 3) Create schemas/tables
 Run the templates in:

@@ -56,7 +56,11 @@ def _clean_and_cast(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def read_bronze_csvs(input_dir: Path) -> pd.DataFrame:
-    files = sorted(input_dir.glob("*.csv"))
+    # Canonical bronze layout is partitioned: data/bronze/dt=YYYY-MM-DD/fares.csv
+    # Keep a flat-folder fallback for legacy/local ad-hoc usage.
+    files = sorted(input_dir.glob("dt=*/fares.csv"))
+    if not files:
+        files = sorted(input_dir.glob("*.csv"))
     if not files:
         raise FileNotFoundError(f"No CSV files found in {input_dir}")
 
@@ -71,7 +75,11 @@ def write_silver_parquet(df: pd.DataFrame, output_path: Path) -> None:
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--input", default="data/bronze", help="Bronze folder with CSV files")
+    p.add_argument(
+        "--input",
+        default="data/bronze",
+        help="Bronze root (expects dt=*/fares.csv partitions by default)",
+    )
     p.add_argument("--output", default="data/silver/flight_fares.parquet", help="Silver parquet output path")
     args = p.parse_args()
 

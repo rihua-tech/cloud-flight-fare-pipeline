@@ -64,16 +64,16 @@ $env:REDSHIFT_PASSWORD="your_password"
 $env:REDSHIFT_SCHEMA_RAW="raw"
 ```
 
-If you use placeholders in the COPY SQL, also set:
+Set COPY placeholder variables:
 ```powershell
 $env:S3_BUCKET="YOUR_BUCKET"
 $env:S3_PREFIX="bronze/dt=YYYY-MM-DD"
 $env:IAM_ROLE_ARN="arn:aws:iam::<acct-id>:role/RedshiftCopyRole"
 ```
 
-## Step 5 - COPY SQL (recommended: placeholders)
+## Step 5 - Confirm COPY SQL placeholders
 
-- Edit `sql/redshift/02_copy_from_s3.sql` and replace the S3 path and IAM role:
+`sql/redshift/02_copy_from_s3.sql` should use placeholders:
 ```sql
 
 copy "raw".fares
@@ -88,10 +88,9 @@ blanksasnull
 emptyasnull
 acceptinvchars;
 
-...
 ```
 
-- Then set `S3_BUCKET`, `S3_PREFIX`, and `IAM_ROLE_ARN` (see Step 4).
+Set `S3_BUCKET`, `S3_PREFIX`, and `IAM_ROLE_ARN` (see Step 4).
 
 ## Step 6 - Run the Redshift SQL helper
 

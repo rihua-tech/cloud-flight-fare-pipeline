@@ -14,7 +14,7 @@
 
 ## Architecture Overview
 
-![Pipeline Architecture](docs/images/pipeline_architecture.png)
+![Pipeline Architecture](docs/images/architecture_diagram.png)
 
 End-to-end data pipeline architecture showing ingestion,
 raw storage, transformation with dbt, and analytics outputs.
@@ -176,7 +176,7 @@ Current Bronze layout (CSV):
 s3://<bucket>/bronze/dt=YYYY-MM-DD/fares.csv
 ```
 
-*(Legacy note: an earlier version used `bronze/flights/.../fares.jsonl`. If your bucket still has that layout, keep using it — but the Week 4 Redshift COPY helper expects the CSV path above.)*
+*(Deprecated legacy layout: `bronze/flights/.../fares.jsonl`. This repo now uses one canonical Bronze layout: `bronze/dt=YYYY-MM-DD/fares.csv` for both ingestion and Redshift COPY.)*
 
 
 ✅ Real examples (3 days):
