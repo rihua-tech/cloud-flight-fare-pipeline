@@ -11,9 +11,9 @@ This runbook covers Week 4 Part B: load Bronze CSV from S3 into **Redshift Serve
 - IAM Role attached to Redshift Serverless that can read your S3 bucket/prefix (COPY).
 - Bronze CSV exists in S3, e.g. `s3://YOUR_BUCKET/bronze/dt=YYYY-MM-DD/fares.csv`
 - Local:
-  - Python 3.10+
+  - Python 3.11
   - `pip install psycopg2-binary`
-  - `pip install dbt-redshift`
+  - `pip install "dbt-redshift>=1.7,<1.8"`
 - Network access to the Redshift Serverless endpoint.
 
 ## Step 1 - Confirm repo files

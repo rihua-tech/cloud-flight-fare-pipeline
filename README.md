@@ -37,9 +37,9 @@ An end-to-end, **Data Engineering** pipeline with an **Analytics + (optional) Da
 ## Quickstart (Local Demo in 10 Minutes)
 
 ### Prereqs
-- Python 3.11+
+- Python 3.11 (project baseline; matches CI)
 - Docker Desktop (running)
-- dbt (installed in your venv)
+- dbt 1.7.x (`dbt-core` + `dbt-postgres`, installed via `requirements.txt`)
 
 ### 1) Clone + env
 ```bash
@@ -112,7 +112,7 @@ See: `docs/architecture.md`
 - `airflow/` – DAG outline (how you’d orchestrate in production)
 - `analytics/` – “proof” queries + quick EDA notes
 - `ml/` – optional baseline buy/wait model
-- `ci/` – GitHub Actions (lint + unit tests + dbt build)
+- `.github/workflows/` – GitHub Actions (lint + unit tests + dbt build)
 
 ---
 
@@ -195,7 +195,7 @@ s3://<bucket>/bronze/dt=YYYY-MM-DD/fares.csv
 
 
 ## What recruiters should look at (fast)
-- **DE:** `ingestion/`, `warehouse/`, `dbt/`, `sql/redshift/`, `ci/`
+- **DE:** `ingestion/`, `warehouse/`, `dbt/`, `sql/redshift/`, `.github/workflows/`
 - **DA:** `dbt/…/marts/` + `sql/analysis/` + `analytics/`
 - **DS:** `ml/` + feature query in `sql/analysis/buy_wait_features.sql`
 

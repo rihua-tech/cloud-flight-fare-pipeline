@@ -4,7 +4,7 @@ Example-only setup for a Redshift warehouse target. Use placeholders and env var
 
 ## 1) Install dbt-redshift
 ```bash
-pip install dbt-redshift
+pip install "dbt-redshift>=1.7,<1.8"
 ```
 
 ## 2) Create a profile (example)

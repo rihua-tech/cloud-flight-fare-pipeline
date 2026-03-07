@@ -11,8 +11,8 @@ psycopg2-binary>=2.9.0
 boto3>=1.34.0
 
 # dbt (local demo uses Postgres; prod can add dbt-redshift if desired)
-dbt-core>=1.7.0
-dbt-postgres>=1.7.0
+dbt-core>=1.7,<1.8
+dbt-postgres>=1.7,<1.8
 
 # DS optional
 scikit-learn>=1.4.0

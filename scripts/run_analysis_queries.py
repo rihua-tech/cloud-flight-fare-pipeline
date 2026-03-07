@@ -58,6 +58,7 @@ def run_file(conn, path: Path, output_dir: Path) -> None:
 
 def main() -> None:
     engine = create_engine(pg_url())
+    failed_queries = []
     with engine.begin() as conn:
         for filename in QUERY_FILES:
             path = ANALYSIS_DIR / filename
@@ -65,6 +66,15 @@ def main() -> None:
                 run_file(conn, path, OUTPUT_DIR)
             except Exception as exc:
                 print(f"FAILED: {path.name} -> {exc}")
+                failed_queries.append(path.name)
+
+    if failed_queries:
+        print("\nOne or more analysis queries failed:")
+        for name in failed_queries:
+            print(f" - {name}")
+        raise SystemExit(1)
+
+    print(f"\nAll analysis queries completed successfully ({len(QUERY_FILES)} files).")
 
 if __name__ == "__main__":
     main()
