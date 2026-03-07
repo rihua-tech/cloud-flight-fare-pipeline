@@ -25,19 +25,19 @@ This project demonstrates an end-to-end data engineering pipeline for collecting
 
 Outputs include analytics-ready mart tables and example queries that support BI dashboards and pricing analysis workflows.
 
-**AWS • Airflow • Python • SQL • dbt • Redshift (prod) • Postgres (local demo)**
+**AWS | Airflow | Python | SQL | dbt | Redshift (prod) | Postgres (local demo)**
 
 An end-to-end, **Data Engineering** pipeline with an **Analytics + (optional) Data Science** layer.
 
-- **DE core:** ingest → bronze → transform → load → dbt marts → tests/docs → orchestration
+- **DE core:** ingest -> bronze -> transform -> load -> dbt marts -> tests/docs -> orchestration
 - **DA layer:** example SQL queries + ready-to-chart mart tables
-- **DS optional:** simple “Buy vs Wait” baseline model trained from mart features
+- **DS optional:** simple "Buy vs Wait" baseline model trained from mart features
 ---
 
 ## Quickstart (Local Demo in 10 Minutes)
 
 ### Prereqs
-- Python 3.11 (project baseline; matches CI)
+- Python 3.11.x (project baseline; matches CI and `pyproject.toml`)
 - Docker Desktop (running)
 - dbt 1.7.x (`dbt-core` + `dbt-postgres`, installed via `requirements.txt`)
 
@@ -46,8 +46,10 @@ An end-to-end, **Data Engineering** pipeline with an **Analytics + (optional) Da
 git clone https://github.com/rihua-tech/cloud-flight-fare-pipeline.git
 cd cloud-flight-fare-pipeline
 python -m venv .venv
-# Windows
-.venv\Scripts\activate
+
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+
 pip install -r requirements.txt
 ```
 ### 2) Start Postgres (Docker)
@@ -72,19 +74,10 @@ docker exec -it cloud-flight-fare-pipeline-postgres-1 psql -U fare_user -d fare_
 ```
 ###### Note: `dbt/profiles.yml` is ignored (credentials). Use `dbt/profiles.example.yml` as a template and create your own local `dbt/profiles.yml`.
 
-✅ Then run:
-
-```bash
-git add README.md
-git commit -m "Add Quickstart section"
-git push
-
-```
-
 ---
 
 ## Why this project (business story)
-Travel apps and planners struggle with “**When should I book?**” because fares change by route, lead time, seasonality, and volatility.
+Travel apps and planners struggle with "**When should I book?**" because fares change by route, lead time, seasonality, and volatility.
 This pipeline produces clean, tested tables that support:
 - route/lead-time trends
 - price alerts
@@ -93,10 +86,10 @@ This pipeline produces clean, tested tables that support:
 ---
 
 ## Architecture (high level)
-1) **Ingestion (Python):** API → S3 (bronze) OR local filesystem demo  
-2) **Transform (Python or Spark):** bronze → parquet (silver)  
-3) **Warehouse load (SQL/Python):** silver → Redshift (prod) or Postgres (local)  
-4) **Modeling (dbt):** staging → star schema marts (dim/fact) + tests + docs  
+1) **Ingestion (Python):** API -> S3 (bronze) OR local filesystem demo  
+2) **Transform (Python or Spark):** bronze -> parquet (silver)  
+3) **Warehouse load (SQL/Python):** silver -> Redshift (prod) or Postgres (local)  
+4) **Modeling (dbt):** staging -> star schema marts (dim/fact) + tests + docs  
 5) **Analytics & DS:** example queries + optional baseline model
 
 See: `docs/architecture.md`
@@ -104,15 +97,15 @@ See: `docs/architecture.md`
 ---
 
 ## Repo structure
-- `ingestion/` – API ingestion (Python) + local demo mode
-- `transform/` – bronze → silver transforms (pandas) + optional `spark_jobs/`
-- `warehouse/` – loaders + warehouse helpers (Postgres local / Redshift prod templates)
-- `sql/` – DDL + COPY templates + analysis queries
-- `dbt/flight_fares/` – staging + marts + tests + docs
-- `airflow/` – DAG outline (how you’d orchestrate in production)
-- `analytics/` – “proof” queries + quick EDA notes
-- `ml/` – optional baseline buy/wait model
-- `.github/workflows/` – GitHub Actions (lint + unit tests + dbt build)
+- `ingestion/` - API ingestion (Python) + local demo mode
+- `transform/` - bronze -> silver transforms (pandas) + optional `spark_jobs/`
+- `warehouse/` - loaders + warehouse helpers (Postgres local / Redshift prod templates)
+- `sql/` - DDL + COPY templates + analysis queries
+- `dbt/flight_fares/` - staging + marts + tests + docs
+- `airflow/` - DAG outline (how you'd orchestrate in production)
+- `analytics/` - "proof" queries + quick EDA notes
+- `ml/` - optional baseline buy/wait model
+- `.github/workflows/` - GitHub Actions (lint + unit tests + dbt build)
 
 ---
 
@@ -153,14 +146,14 @@ python ml/train_buy_wait.py
 - Proof row counts after dbt: `sql/redshift/verify_marts.sql`
 - Airflow DAG outline: `airflow/dags/flight_fare_pipeline_dag.py`
 - Replace the local demo loader with:
-  - API → S3 ingestion
+  - API -> S3 ingestion
   - Redshift COPY from S3
   - dbt runs in a job container / MWAA
 
 ---
 
 
-## Week 3 — S3 Bronze Ingestion ✅
+## Week 3 - S3 Bronze Ingestion
 
 This step ingests daily fare snapshots and writes them to S3 in **bronze** partitioned folders.
 
@@ -179,7 +172,7 @@ s3://<bucket>/bronze/dt=YYYY-MM-DD/fares.csv
 *(Deprecated legacy layout: `bronze/flights/.../fares.jsonl`. This repo now uses one canonical Bronze layout: `bronze/dt=YYYY-MM-DD/fares.csv` for both ingestion and Redshift COPY.)*
 
 
-✅ Real examples (3 days):
+Real examples (3 days):
 - `s3://cloud-flight-fare-pipeline-rihua-2026-east1/bronze/dt=2026-01-22/fares.csv`
 - `s3://cloud-flight-fare-pipeline-rihua-2026-east1/bronze/dt=2026-01-23/fares.csv`
 - `s3://cloud-flight-fare-pipeline-rihua-2026-east1/bronze/dt=2026-01-24/fares.csv`
@@ -196,26 +189,26 @@ s3://<bucket>/bronze/dt=YYYY-MM-DD/fares.csv
 
 ## What recruiters should look at (fast)
 - **DE:** `ingestion/`, `warehouse/`, `dbt/`, `sql/redshift/`, `.github/workflows/`
-- **DA:** `dbt/…/marts/` + `sql/analysis/` + `analytics/`
+- **DA:** `dbt/.../marts/` + `sql/analysis/` + `analytics/`
 - **DS:** `ml/` + feature query in `sql/analysis/buy_wait_features.sql`
 
-## Week 4 — Warehouse Target (Summary)
+## Week 4 - Warehouse Target (Summary)
 
-**Option A (Local demo): Postgres “warehouse mode”**
+**Option A (Local demo): Postgres "warehouse mode"**
 1) docker compose up -d
 2) python scripts/load_sample_to_postgres.py (or the psql files if you keep that method)
 3) dbt build -t pg_warehouse
 4) Link: warehouse/postgres_local.md (or docs/...)
 
-**Option B (AWS): S3 → Redshift Serverless → dbt**
+**Option B (AWS): S3 -> Redshift Serverless -> dbt**
 1) python warehouse/run_redshift_sql.py
 2) dbt debug -t redshift
 3) dbt build -t redshift
 4) Link: docs/week4_redshift_runbook.md
 
-## Week 4 — Warehouse target (S3 → Redshift Serverless → dbt) ✅
+## Week 4 - Warehouse target (S3 -> Redshift Serverless -> dbt)
 
-This repo can run against **Redshift Serverless** as a second “warehouse target” (in addition to local Postgres demo).
+This repo can run against **Redshift Serverless** as a second "warehouse target" (in addition to local Postgres demo).
 
 **High-level flow**
 1) Bronze file exists in S3 (CSV)
@@ -245,12 +238,12 @@ select count(*) from marts.fact_fares;
 select * from marts.dim_route limit 10;
 ```
 
-See `docs/week4_redshift_runbook.md` for full steps + “no secrets committed” notes.
+See `docs/week4_redshift_runbook.md` for full steps + "no secrets committed" notes.
 
 
 ---
 
-## Week 5 — Orchestration (Airflow, Local)
+## Week 5 - Orchestration (Airflow, Local)
 
 Implemented a local Airflow orchestration demo for the **Cloud Flight Fare Pipeline** to satisfy the Week 5 requirement: **scheduled runs + retries + logs**.
 
@@ -263,9 +256,9 @@ Implemented a local Airflow orchestration demo for the **Cloud Flight Fare Pipel
 
 ### Task flow (end-to-end)
 
-1. `load_sample_to_postgres` — loads sample fare data into local Postgres
-2. `dbt_build` — runs `dbt deps` and `dbt build` (models + tests)
-3. `run_analysis_queries` — runs proof/analysis SQL queries
+1. `load_sample_to_postgres` - loads sample fare data into local Postgres
+2. `dbt_build` - runs `dbt deps` and `dbt build` (models + tests)
+3. `run_analysis_queries` - runs proof/analysis SQL queries
 
 ### Run locally (Week 5 demo)
 
@@ -285,7 +278,7 @@ Open Airflow UI:
 
 ### Logs and rerun behavior proof
 
-* Task logs are captured in the **Airflow UI** (Task → Logs)
+* Task logs are captured in the **Airflow UI** (Task -> Logs)
 * Rerun behavior was validated using **Clear and Retry** on a successful task (`run_analysis_queries`) in Graph view
 
 ### Week 5 screenshots
@@ -303,7 +296,7 @@ Included proof:
 
 ---
 
-## Week 6 — Documentation & Analytics Handoff
+## Week 6 - Documentation & Analytics Handoff
 
 Portfolio handoff for reviewers: this section summarizes how to run and validate the pipeline.
 Detailed implementation evidence remains in Weeks 3-5 above.
