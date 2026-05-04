@@ -11,5 +11,6 @@ class Settings:
     aws_region: str = os.getenv("AWS_REGION", "us-east-1")
     s3_bucket: str = os.getenv("S3_BUCKET", "")
     s3_prefix_bronze: str = os.getenv("S3_PREFIX_BRONZE", "bronze")
+    bronze_rerun_behavior: str = os.getenv("BRONZE_RERUN_BEHAVIOR", "overwrite")
 
 settings = Settings()

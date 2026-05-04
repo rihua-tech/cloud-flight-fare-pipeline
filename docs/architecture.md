@@ -31,7 +31,7 @@ The production-oriented path keeps the same logical model while changing infrast
 
 Typical flow:
 1. Ingest API snapshots to S3 bronze partitions:
-   - `python -m ingestion.ingest_api_to_s3 --start YYYY-MM-DD --days N --to-s3`
+   - `python -m ingestion.ingest_api_to_s3 --mode s3 --start YYYY-MM-DD --days N`
 2. Load bronze files into Redshift raw schema:
    - `python warehouse/run_redshift_sql.py`
 3. Build dbt models/tests in Redshift:

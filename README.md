@@ -10,6 +10,7 @@
 - [Local Demo](#local-demo-runs-without-aws)
 - [Production](#production-notes-awsredshift)
 - [Analytics-ready Output (Week 6)](#analytics-ready-output-week-6)
+- [Real AWS Bronze S3 Ingestion Proof (Week 7)](#real-aws-bronze-s3-ingestion-proof-week-7)
 - [Dashboard Preview](#dashboard-preview-artifact)
 
 ## Architecture Overview
@@ -159,7 +160,7 @@ This step ingests daily fare snapshots and writes them to S3 in **bronze** parti
 
 ### Command I ran (3 days)
 ```bash
-python -m ingestion.ingest_api_to_s3 --start 2026-01-17 --days 3 --to-s3
+python -m ingestion.ingest_api_to_s3 --mode s3 --start 2026-01-17 --days 3
 ```
 
 ### S3 path convention
@@ -407,6 +408,56 @@ Supporting documentation:
 - [docs/images/dashboard_screenshot.png](docs/images/dashboard_screenshot.png)
 
 ![Dashboard screenshot](docs/images/dashboard_screenshot.png)
+
+---
+
+## Real AWS Bronze S3 Ingestion Proof (Week 7)
+
+Week 7 promotes Bronze ingestion to a clear real AWS S3 proof path while keeping
+the local Postgres/dbt/Airflow demo unchanged.
+
+Implemented:
+- `ingestion.ingest_api_to_s3` supports explicit `--mode s3` runs.
+- Multi-day Bronze CSV output writes to `s3://<bucket>/bronze/dt=YYYY-MM-DD/fares.csv`.
+- Each run writes a manifest to `s3://<bucket>/bronze/_manifests/`.
+- Manifest metadata includes run timestamp, dates processed, row counts per date,
+  output S3 paths, partition statuses, and rerun behavior.
+- Default rerun behavior is `overwrite`: reruns intentionally replace `fares.csv`
+  at the same date partition path. Use `--rerun-behavior skip-existing` to leave
+  existing partitions unchanged.
+
+Run Week 7 against AWS S3:
+
+```powershell
+$env:AWS_REGION="us-east-1"
+$env:AWS_PROFILE="<your-profile-name>"
+$env:S3_BUCKET="<your-bucket-name>"
+$env:S3_PREFIX_BRONZE="bronze"
+
+python -m ingestion.ingest_api_to_s3 --mode s3 --start 2026-01-17 --days 3
+```
+
+Run 7 sample dates:
+
+```powershell
+python -m ingestion.ingest_api_to_s3 --mode s3 --start 2026-01-17 --days 7
+```
+
+Verify:
+
+```powershell
+aws s3 ls "s3://$env:S3_BUCKET/bronze/" --recursive
+aws s3 ls "s3://$env:S3_BUCKET/bronze/_manifests/"
+```
+
+Save proof screenshots/logs under `docs/screenshots/week7/`:
+- terminal output showing uploaded partitions and manifest path
+- S3 console showing `bronze/dt=YYYY-MM-DD/` folders
+- S3 console showing `bronze/_manifests/`
+- manifest JSON preview with row counts, S3 paths, and rerun behavior
+- optional rerun proof showing `overwritten` or `skipped_existing`
+
+Full runbook: [docs/runbooks/week7_s3_bronze_ingestion.md](docs/runbooks/week7_s3_bronze_ingestion.md)
 
 ---
 

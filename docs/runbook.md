@@ -16,6 +16,14 @@ python scripts/run_analysis_queries.py
 - **port 5432 already used:** stop your local Postgres or change the port mapping in docker-compose
 
 
+## Week 7 S3 Bronze proof
+
+Use the dedicated runbook for real AWS S3 Bronze ingestion:
+
+- [week7_s3_bronze_ingestion.md](runbooks/week7_s3_bronze_ingestion.md)
+
+The local demo commands above remain the default no-AWS path.
+
 ## Bronze → Silver (Week 2)
 
 1) Place raw/bronze CSVs into `data/bronze/`
