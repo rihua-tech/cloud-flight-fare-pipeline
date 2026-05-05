@@ -11,6 +11,7 @@
 - [Production](#production-notes-awsredshift)
 - [Analytics-ready Output (Week 6)](#analytics-ready-output-week-6)
 - [Real AWS Bronze S3 Ingestion Proof (Week 7)](#real-aws-bronze-s3-ingestion-proof-week-7)
+- [Real AWS Warehouse Proof (Week 8)](#real-aws-warehouse-proof-week-8)
 - [Dashboard Preview](#dashboard-preview-artifact)
 
 ## Architecture Overview
@@ -461,3 +462,50 @@ Full runbook: [docs/runbooks/week7_s3_bronze_ingestion.md](docs/runbooks/week7_s
 
 ---
 
+## Real AWS Warehouse Proof (Week 8)
+
+Week 8 proves the AWS warehouse path: S3 Bronze CSV data loads into Redshift
+Serverless, then dbt builds staging and marts with tests against the Redshift
+target.
+
+Implemented proof path:
+- Redshift setup SQL creates `raw`, `staging`, `analytics`, and `marts` schemas.
+- `raw.fares` is created for the canonical Bronze CSV layout.
+- Redshift `COPY` loads from an exact `S3_COPY_URI`, including multi-day
+  prefixes such as `s3://<bucket>/bronze/dt=`.
+- Raw proof queries cover row count, min/max date, row count by date, sample
+  rows, and key-column null checks.
+- dbt Redshift target documentation explains `dbt debug -t redshift` and
+  `dbt build -t redshift`.
+
+Run the warehouse proof:
+
+```powershell
+$env:AWS_REGION="us-east-1"
+$env:REDSHIFT_HOST="<workgroup>.<region>.redshift-serverless.amazonaws.com"
+$env:REDSHIFT_PORT="5439"
+$env:REDSHIFT_DBNAME="dev"
+$env:REDSHIFT_USER="<redshift-user>"
+$env:REDSHIFT_PASSWORD="<redshift-password>"
+$env:REDSHIFT_SCHEMA_RAW="raw"
+$env:IAM_ROLE_ARN="arn:aws:iam::<account-id>:role/<redshift-s3-copy-role>"
+$env:S3_COPY_URI="s3://<bucket>/bronze/dt="
+
+python warehouse/run_redshift_sql.py --dry-run
+python warehouse/run_redshift_sql.py
+python warehouse/run_redshift_sql.py --files 03_raw_load_proof_queries.sql
+dbt debug --project-dir dbt/flight_fares --profiles-dir dbt -t redshift
+dbt build --project-dir dbt/flight_fares --profiles-dir dbt -t redshift
+```
+
+Save proof screenshots/logs under `docs/screenshots/week8/`:
+- Redshift Serverless workgroup/namespace and attached IAM role
+- rendered COPY SQL or successful load log
+- raw proof query output
+- `dbt debug -t redshift` success
+- `dbt build -t redshift` success with tests
+- mart proof query output
+
+Full runbook: [docs/runbooks/week8_redshift_warehouse_proof.md](docs/runbooks/week8_redshift_warehouse_proof.md)
+
+---

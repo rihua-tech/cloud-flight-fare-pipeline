@@ -29,6 +29,23 @@ def get_env(name: str, default: str | None = None) -> str | None:
     return value
 
 
+def build_s3_copy_uri(bucket: str | None, prefix: str | None) -> str | None:
+    if not bucket or not prefix:
+        return None
+
+    clean_prefix = prefix.strip("/")
+    if not clean_prefix:
+        return None
+
+    if clean_prefix.endswith(".csv") or clean_prefix.endswith("="):
+        return f"s3://{bucket}/{clean_prefix}"
+
+    if re.search(r"(^|/)dt=\d{4}-\d{2}-\d{2}$", clean_prefix):
+        return f"s3://{bucket}/{clean_prefix}/fares.csv"
+
+    return f"s3://{bucket}/{clean_prefix}"
+
+
 def required_connection_env() -> dict[str, str]:
     missing = []
     host = get_env("REDSHIFT_HOST")
@@ -62,9 +79,15 @@ def required_connection_env() -> dict[str, str]:
 
 
 def render_sql(sql: str) -> str:
+    s3_copy_uri = get_env("S3_COPY_URI") or build_s3_copy_uri(
+        get_env("S3_BUCKET"),
+        get_env("S3_PREFIX"),
+    )
     replacements = {
+        "AWS_REGION": get_env("AWS_REGION", "us-east-1"),
         "S3_BUCKET": get_env("S3_BUCKET"),
         "S3_PREFIX": get_env("S3_PREFIX"),
+        "S3_COPY_URI": s3_copy_uri,
         "IAM_ROLE_ARN": get_env("IAM_ROLE_ARN"),
         "REDSHIFT_SCHEMA_RAW": get_env("REDSHIFT_SCHEMA_RAW", "raw"),
     }
@@ -86,6 +109,12 @@ def execute_sql(conn, sql: str) -> None:
     with conn.cursor() as cur:
         for stmt in statements:
             cur.execute(stmt)
+            if cur.description:
+                columns = [desc[0] for desc in cur.description]
+                rows = cur.fetchall()
+                print("\t".join(columns))
+                for row in rows:
+                    print("\t".join("" if value is None else str(value) for value in row))
 
 
 def build_arg_parser() -> argparse.ArgumentParser:

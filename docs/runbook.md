@@ -24,6 +24,12 @@ Use the dedicated runbook for real AWS S3 Bronze ingestion:
 
 The local demo commands above remain the default no-AWS path.
 
+## Week 8 Redshift warehouse proof
+
+Use the dedicated runbook for S3 Bronze to Redshift Serverless to dbt:
+
+- [week8_redshift_warehouse_proof.md](runbooks/week8_redshift_warehouse_proof.md)
+
 ## Bronze → Silver (Week 2)
 
 1) Place raw/bronze CSVs into `data/bronze/`

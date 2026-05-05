@@ -1,10 +1,11 @@
-select count(*) as raw_cnt from raw.fares;
+select count(*) as raw_cnt from "{{REDSHIFT_SCHEMA_RAW}}".fares;
+
 select *
-from raw.fares
+from "{{REDSHIFT_SCHEMA_RAW}}".fares
 limit 10;
 
 select count(*) as staging_cnt from staging.stg_fares;
+
 select *
-from 
-staging.stg_fares 
+from staging.stg_fares
 limit 20;
