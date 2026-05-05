@@ -22,7 +22,8 @@ REDSHIFT_PASSWORD=
 REDSHIFT_SCHEMA_RAW=raw
 
 S3_BUCKET=
-S3_PREFIX=bronze/dt=YYYY-MM-DD
+S3_PREFIX=bronze/dt=
+S3_COPY_URI=
 IAM_ROLE_ARN=
 ```
 
@@ -33,16 +34,19 @@ Run the templates in:
 - `sql/redshift/00_reset_schemas.sql`
 - `sql/redshift/01_create_raw_table.sql`
 - `sql/redshift/02_copy_from_s3.sql` (load `raw.fares`)
+- `sql/redshift/03_raw_load_proof_queries.sql` (validate `raw.fares`)
 
 Or use the helper:
 ```bash
 python warehouse/run_redshift_sql.py
+python warehouse/run_redshift_sql.py --files 03_raw_load_proof_queries.sql
 ```
 
 dbt models will land in `staging` and `marts` schemas.
 
 ## 4) Run dbt against Redshift
 ```bash
+dbt debug --project-dir dbt/flight_fares --profiles-dir dbt --target redshift
 dbt build --project-dir dbt/flight_fares --profiles-dir dbt --target redshift
 ```
 

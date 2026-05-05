@@ -15,6 +15,7 @@ Use this page as the docs index.
 ## Operations
 - **Local Runbook / Troubleshooting:** [runbook.md](./runbook.md)
 - **S3 Bronze Runbook (Week 7):** [week7_s3_bronze_ingestion.md](./runbooks/week7_s3_bronze_ingestion.md)
+- **Redshift Warehouse Runbook (Week 8):** [week8_redshift_warehouse_proof.md](./runbooks/week8_redshift_warehouse_proof.md)
 - **Redshift Runbook (Week 4):** [week4_redshift_runbook.md](./week4_redshift_runbook.md)
 
 ## Visual Assets
@@ -24,4 +25,5 @@ Use this page as the docs index.
 ## Suggested Reading Paths
 - **Local demo path:** architecture -> runbook -> how_to_use_marts -> data_dictionary
 - **AWS Bronze proof path:** architecture -> runbooks/week7_s3_bronze_ingestion
+- **AWS warehouse proof path:** architecture -> runbooks/week8_redshift_warehouse_proof
 - **AWS warehouse path:** architecture -> week4_redshift_runbook -> how_to_use_marts -> kpi_definitions

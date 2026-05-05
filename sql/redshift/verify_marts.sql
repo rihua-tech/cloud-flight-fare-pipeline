@@ -1,6 +1,6 @@
 -- Proof queries after dbt build (row counts)
 -- Replace {{REDSHIFT_SCHEMA_RAW}} if you use a different raw schema.
-select '{{REDSHIFT_SCHEMA_RAW}}.fares' as table_name, count(*) as row_count from {{REDSHIFT_SCHEMA_RAW}}.fares
+select '{{REDSHIFT_SCHEMA_RAW}}.fares' as table_name, count(*) as row_count from "{{REDSHIFT_SCHEMA_RAW}}".fares
 union all
 select 'staging.stg_fares' as table_name, count(*) as row_count from staging.stg_fares
 union all
