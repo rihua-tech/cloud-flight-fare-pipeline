@@ -1,0 +1,7 @@
+{
+  "logGroupName": "/ecs/cloud-flight-fare-pipeline/week9",
+  "tags": {
+    "Project": "cloud-flight-fare-pipeline",
+    "ProofWeek": "9"
+  }
+}

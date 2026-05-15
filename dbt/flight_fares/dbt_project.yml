@@ -17,8 +17,8 @@ clean-targets:
 models:
   flight_fares:
     staging:
-      +schema: staging
+      +schema: "{{ env_var('REDSHIFT_SCHEMA_STAGING', 'staging') }}"
       +materialized: view
     marts:
-      +schema: marts
+      +schema: "{{ env_var('REDSHIFT_SCHEMA_MARTS', 'marts') }}"
       +materialized: table

@@ -1,0 +1,35 @@
+{
+  "Name": "cloud-flight-fare-pipeline-week9-daily",
+  "GroupName": "default",
+  "ScheduleExpression": "cron(0 12 * * ? *)",
+  "ScheduleExpressionTimezone": "UTC",
+  "FlexibleTimeWindow": {
+    "Mode": "OFF"
+  },
+  "State": "ENABLED",
+  "Target": {
+    "Arn": "arn:aws:ecs:<region>:<account-id>:cluster/cloud-flight-fare-pipeline-week9",
+    "RoleArn": "arn:aws:iam::<account-id>:role/<eventbridge-scheduler-ecs-role>",
+    "EcsParameters": {
+      "TaskDefinitionArn": "arn:aws:ecs:<region>:<account-id>:task-definition/cloud-flight-fare-pipeline-batch:<revision>",
+      "LaunchType": "FARGATE",
+      "PlatformVersion": "LATEST",
+      "NetworkConfiguration": {
+        "awsvpcConfiguration": {
+          "Subnets": [
+            "subnet-<id-1>",
+            "subnet-<id-2>"
+          ],
+          "SecurityGroups": [
+            "sg-<id>"
+          ],
+          "AssignPublicIp": "ENABLED"
+        }
+      }
+    },
+    "RetryPolicy": {
+      "MaximumEventAgeInSeconds": 3600,
+      "MaximumRetryAttempts": 1
+    }
+  }
+}
