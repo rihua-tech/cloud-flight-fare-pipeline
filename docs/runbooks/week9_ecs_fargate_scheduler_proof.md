@@ -1,9 +1,9 @@
 # Week 9 Runbook - Real AWS Scheduled Pipeline Proof
 
-Week 9 adds a real AWS scheduled execution path:
+Week 9 proves the Current Proven AWS Path:
 
 ```text
-EventBridge Scheduler -> ECS/Fargate task -> Docker batch runner -> CloudWatch Logs
+EventBridge Scheduler -> ECS / Fargate Batch Container -> Flight API Ingestion -> S3 Bronze -> Redshift Serverless -> dbt staging/marts/tests -> CloudWatch Logs
 ```
 
 Proof status: complete. A manual ECS/Fargate run and an EventBridge Scheduler
