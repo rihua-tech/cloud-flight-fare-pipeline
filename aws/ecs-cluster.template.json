@@ -1,0 +1,19 @@
+{
+  "clusterName": "cloud-flight-fare-pipeline-week9",
+  "settings": [
+    {
+      "name": "containerInsights",
+      "value": "enabled"
+    }
+  ],
+  "tags": [
+    {
+      "key": "Project",
+      "value": "cloud-flight-fare-pipeline"
+    },
+    {
+      "key": "ProofWeek",
+      "value": "9"
+    }
+  ]
+}

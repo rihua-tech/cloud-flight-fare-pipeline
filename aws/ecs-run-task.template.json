@@ -1,0 +1,19 @@
+{
+  "cluster": "cloud-flight-fare-pipeline-week9",
+  "taskDefinition": "cloud-flight-fare-pipeline-batch",
+  "launchType": "FARGATE",
+  "platformVersion": "LATEST",
+  "count": 1,
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "subnets": [
+        "subnet-<id-1>",
+        "subnet-<id-2>"
+      ],
+      "securityGroups": [
+        "sg-<id>"
+      ],
+      "assignPublicIp": "ENABLED"
+    }
+  }
+}

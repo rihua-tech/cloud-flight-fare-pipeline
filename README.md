@@ -12,6 +12,7 @@
 - [Analytics-ready Output (Week 6)](#analytics-ready-output-week-6)
 - [Real AWS Bronze S3 Ingestion Proof (Week 7)](#real-aws-bronze-s3-ingestion-proof-week-7)
 - [Real AWS Warehouse Proof (Week 8)](#real-aws-warehouse-proof-week-8)
+- [Real AWS Scheduled Pipeline Proof (Week 9)](#real-aws-scheduled-pipeline-proof-week-9)
 - [Dashboard Preview](#dashboard-preview-artifact)
 
 ## Architecture Overview
@@ -507,5 +508,63 @@ Save proof screenshots/logs under `docs/screenshots/week8/`:
 - mart proof query output
 
 Full runbook: [docs/runbooks/week8_redshift_warehouse_proof.md](docs/runbooks/week8_redshift_warehouse_proof.md)
+
+---
+
+## Real AWS Scheduled Pipeline Proof (Week 9)
+
+Week 9 proves the scheduled AWS batch execution path:
+
+```text
+EventBridge Scheduler -> ECS/Fargate -> Docker batch runner -> CloudWatch Logs
+```
+
+Implemented in this repo:
+- `Dockerfile.batch` for building a Python/dbt batch image.
+- `scripts/run_aws_batch_pipeline.py` as the ECS entrypoint.
+- AWS CLI templates under `aws/` for ECR, ECS cluster, ECS task definition,
+  manual Fargate run, EventBridge Scheduler, and CloudWatch log group.
+- `.dockerignore` to keep local secrets, dbt profiles, generated data, and
+  screenshots out of the Docker build context.
+
+Completed proof:
+- ECR image tag `week9` was pushed.
+- ECS cluster `cloud-flight-fare-pipeline-week9` ran task definition
+  `cloud-flight-fare-pipeline-batch:2`.
+- Manual ECS/Fargate run completed with exit code `0`.
+- EventBridge Scheduler triggered ECS/Fargate with the same task definition.
+- Manual and scheduled CloudWatch log streams both showed
+  `WEEK9_BATCH_SUCCESS`.
+- A one-time proof schedule used `ActionAfterCompletion=DELETE`.
+- The recurring daily schedule was disabled after proof collection to avoid
+  unwanted daily AWS runs and cost.
+
+The batch runner composes the existing Week 7/8 commands and generates a dbt
+`flight_fares` profile at runtime from environment variables and ECS Secrets
+Manager:
+
+```powershell
+python -m ingestion.ingest_api_to_s3 --mode s3
+python warehouse/run_redshift_sql.py
+dbt build --project-dir dbt/flight_fares --profiles-dir <runtime-profile-dir> -t redshift
+python warehouse/run_redshift_sql.py --files verify_marts.sql
+```
+
+Save Week 9 screenshots/logs under:
+
+```text
+docs/screenshots/week9/
+```
+
+Expected proof screenshots:
+- `01-ecr-pushed-image-tag.png`
+- `02-ecs-cluster.png`
+- `03-ecs-task-definition-revision.png`
+- `04-manual-fargate-task-exit-code-0.png`
+- `05-cloudwatch-manual-run-week9-success.png`
+- `06-eventbridge-scheduler-enabled-target.png`
+- `07-cloudwatch-scheduled-run-week9-success.png`
+
+Full runbook: [docs/runbooks/week9_ecs_fargate_scheduler_proof.md](docs/runbooks/week9_ecs_fargate_scheduler_proof.md)
 
 ---

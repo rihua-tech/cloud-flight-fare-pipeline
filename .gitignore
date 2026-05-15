@@ -1,22 +1,92 @@
+# =========================================================
+# Environment / secrets
+# =========================================================
 .env
-.venv/
-dbt/.user.yml
+.env.*
+!.env.example
+
+# Local AWS files with real account IDs, subnet IDs, role ARNs, or secret ARNs
+aws/*.local.json
+
+# dbt local profiles / user state
 dbt/profiles.yml
+dbt/.user.yml
+dbt/**/profiles.yml
+dbt/**/.user.yml
+
+# =========================================================
+# Python virtual environments
+# =========================================================
+.venv/
+venv/
+env/
+ENV/
+
+# =========================================================
+# Python cache / build artifacts
+# =========================================================
 __pycache__/
-*.pyc
+**/__pycache__/
+*.py[cod]
+*$py.class
+
 .pytest_cache/
+.ruff_cache/
 .mypy_cache/
-.DS_Store
-.idea/
-.vscode/
+.coverage
+coverage.xml
+htmlcov/
+
+build/
+dist/
+*.egg-info/
+
+# =========================================================
+# dbt generated artifacts
+# =========================================================
 target/
 dbt_packages/
 logs/
-*.log
-analytics/outputs/
 
-# Generated data
+dbt/**/target/
+dbt/**/dbt_packages/
+dbt/**/logs/
+
+# =========================================================
+# Generated local data
+# =========================================================
 data/bronze/
 data/silver/
+data/gold/
+analytics/outputs/
+
+# =========================================================
+# Airflow local runtime artifacts
+# =========================================================
+airflow/logs/
+airflow/*.db
+airflow/airflow.db
+
+# =========================================================
+# Jupyter / notebooks
+# =========================================================
+.ipynb_checkpoints/
+
+# =========================================================
+# IDE / editor files
+# =========================================================
+.vscode/
+.idea/
+
+# =========================================================
+# OS files
+# =========================================================
+.DS_Store
+Thumbs.db
+
+# =========================================================
+# Logs
+# =========================================================
+*.log
 
 

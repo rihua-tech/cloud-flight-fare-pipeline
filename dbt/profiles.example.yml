@@ -20,6 +20,6 @@ flight_fares:
       user: "{{ env_var('REDSHIFT_USER', '') }}"
       password: "{{ env_var('REDSHIFT_PASSWORD', '') }}"
       dbname: "{{ env_var('REDSHIFT_DBNAME', 'dev') }}"
-      schema: staging
+      schema: "{{ env_var('REDSHIFT_SCHEMA_STAGING', 'staging') }}"
       threads: 4
-      sslmode: prefer
+      sslmode: "{{ env_var('REDSHIFT_SSLMODE', 'require') }}"

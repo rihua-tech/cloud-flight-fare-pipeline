@@ -1,0 +1,124 @@
+{
+  "family": "cloud-flight-fare-pipeline-batch",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::<account-id>:role/<ecs-task-execution-role>",
+  "taskRoleArn": "arn:aws:iam::<account-id>:role/<ecs-task-role>",
+  "runtimePlatform": {
+    "operatingSystemFamily": "LINUX",
+    "cpuArchitecture": "X86_64"
+  },
+  "containerDefinitions": [
+    {
+      "name": "flight-fare-batch",
+      "image": "<account-id>.dkr.ecr.<region>.amazonaws.com/cloud-flight-fare-pipeline-batch:week9",
+      "essential": true,
+      "command": [
+        "python",
+        "scripts/run_aws_batch_pipeline.py"
+      ],
+      "environment": [
+        {
+          "name": "AWS_REGION",
+          "value": "<region>"
+        },
+        {
+          "name": "S3_BUCKET",
+          "value": "<bronze-bucket-name>"
+        },
+        {
+          "name": "S3_PREFIX_BRONZE",
+          "value": "bronze"
+        },
+        {
+          "name": "S3_COPY_URI",
+          "value": "s3://<bronze-bucket-name>/bronze/dt="
+        },
+        {
+          "name": "IAM_ROLE_ARN",
+          "value": "arn:aws:iam::<account-id>:role/<redshift-s3-copy-role>"
+        },
+        {
+          "name": "REDSHIFT_HOST",
+          "value": "<workgroup>.<region>.redshift-serverless.amazonaws.com"
+        },
+        {
+          "name": "REDSHIFT_PORT",
+          "value": "5439"
+        },
+        {
+          "name": "REDSHIFT_DBNAME",
+          "value": "dev"
+        },
+        {
+          "name": "REDSHIFT_USER",
+          "value": "<redshift-user>"
+        },
+        {
+          "name": "REDSHIFT_SCHEMA_RAW",
+          "value": "raw"
+        },
+        {
+          "name": "REDSHIFT_SCHEMA_STAGING",
+          "value": "staging"
+        },
+        {
+          "name": "REDSHIFT_SCHEMA_MARTS",
+          "value": "marts"
+        },
+        {
+          "name": "REDSHIFT_SSLMODE",
+          "value": "require"
+        },
+        {
+          "name": "BATCH_PIPELINE_STEPS",
+          "value": "s3_ingest,redshift_load,dbt_build,redshift_verify"
+        },
+        {
+          "name": "BATCH_DBT_TARGET",
+          "value": "redshift"
+        },
+        {
+          "name": "BATCH_DBT_DEPS",
+          "value": "true"
+        },
+        {
+          "name": "PIPELINE_DAYS",
+          "value": "1"
+        },
+        {
+          "name": "BRONZE_RERUN_BEHAVIOR",
+          "value": "overwrite"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "REDSHIFT_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:<region>:<account-id>:secret:<redshift-password-secret>"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/cloud-flight-fare-pipeline/week9",
+          "awslogs-region": "<region>",
+          "awslogs-stream-prefix": "week9"
+        }
+      }
+    }
+  ],
+  "tags": [
+    {
+      "key": "Project",
+      "value": "cloud-flight-fare-pipeline"
+    },
+    {
+      "key": "ProofWeek",
+      "value": "9"
+    }
+  ]
+}

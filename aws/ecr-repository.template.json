@@ -1,0 +1,10 @@
+{
+  "repositoryName": "cloud-flight-fare-pipeline-batch",
+  "imageScanningConfiguration": {
+    "scanOnPush": true
+  },
+  "imageTagMutability": "MUTABLE",
+  "encryptionConfiguration": {
+    "encryptionType": "AES256"
+  }
+}
