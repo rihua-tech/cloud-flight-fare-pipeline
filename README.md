@@ -599,6 +599,8 @@ Expected proof screenshots:
 
 Full runbook: [docs/runbooks/week9_ecs_fargate_scheduler_proof.md](docs/runbooks/week9_ecs_fargate_scheduler_proof.md)
 
+---
+
 ## Week 10 Documentation Closeout
 
 Week 10 closes out the repository as a recruiter-ready AWS cloud data
