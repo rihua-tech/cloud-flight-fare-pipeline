@@ -1,4 +1,5 @@
 .env
+aws/*.local.json
 .venv/
 .git/
 .github/

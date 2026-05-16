@@ -192,6 +192,9 @@ Copy and fill in the template:
 Copy-Item aws\eventbridge-scheduler.template.json aws\eventbridge-scheduler.local.json
 ```
 
+The scheduler template is disabled by default for cost safety; enable it only
+for proof runs.
+
 Replace:
 
 - `<region>`

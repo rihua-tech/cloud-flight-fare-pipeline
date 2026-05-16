@@ -1,5 +1,6 @@
 -- Proof queries after dbt build (row counts)
 -- Replace {{REDSHIFT_SCHEMA_RAW}} if you use a different raw schema.
+-- This verification SQL assumes the default dbt schemas: staging and marts.
 select '{{REDSHIFT_SCHEMA_RAW}}.fares' as table_name, count(*) as row_count from "{{REDSHIFT_SCHEMA_RAW}}".fares
 union all
 select 'staging.stg_fares' as table_name, count(*) as row_count from staging.stg_fares

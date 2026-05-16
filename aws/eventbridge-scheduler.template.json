@@ -6,7 +6,7 @@
   "FlexibleTimeWindow": {
     "Mode": "OFF"
   },
-  "State": "ENABLED",
+  "State": "DISABLED",
   "Target": {
     "Arn": "arn:aws:ecs:<region>:<account-id>:cluster/cloud-flight-fare-pipeline-week9",
     "RoleArn": "arn:aws:iam::<account-id>:role/<eventbridge-scheduler-ecs-role>",
