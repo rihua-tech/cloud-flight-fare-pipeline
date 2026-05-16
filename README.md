@@ -1,160 +1,196 @@
 # Cloud Flight Fare Pipeline
 [![CI](https://github.com/rihua-tech/cloud-flight-fare-pipeline/actions/workflows/ci.yml/badge.svg)](https://github.com/rihua-tech/cloud-flight-fare-pipeline/actions/workflows/ci.yml)
 
-## Contents
-- [Architecture Overview](#architecture-overview)
-- [Project Overview](#project-overview)
-- [Quickstart](#quickstart-local-demo-in-10-minutes)
-- [Architecture](#architecture-high-level)
-- [Repo Structure](#repo-structure)
-- [Local Demo](#local-demo-runs-without-aws)
-- [Production](#production-notes-awsredshift)
-- [Analytics-ready Output (Week 6)](#analytics-ready-output-week-6)
-- [Real AWS Bronze S3 Ingestion Proof (Week 7)](#real-aws-bronze-s3-ingestion-proof-week-7)
-- [Real AWS Warehouse Proof (Week 8)](#real-aws-warehouse-proof-week-8)
-- [Real AWS Scheduled Pipeline Proof (Week 9)](#real-aws-scheduled-pipeline-proof-week-9)
-- [Dashboard Preview](#dashboard-preview-artifact)
+## What This Proves
 
-## Architecture Overview
+This is a cloud data engineering proof project for a flight fare analytics
+pipeline. It does more than show local scripts: the AWS path was run end to end
+with real AWS services, proof screenshots, and CloudWatch success logs.
 
-![Pipeline Architecture](docs/images/architecture_diagram.png)
+Implemented cloud path:
 
-End-to-end data pipeline architecture showing ingestion,
-raw storage, transformation with dbt, and analytics outputs.
+```text
+EventBridge Scheduler -> ECS / Fargate Batch Container -> Flight API Ingestion -> S3 Bronze -> Redshift Serverless -> dbt staging/marts/tests -> CloudWatch Logs
+```
 
-## Project Overview
+Services and tools used: **EventBridge Scheduler, ECS/Fargate, ECR, S3,
+Redshift Serverless, Secrets Manager, CloudWatch Logs, Docker, Python, SQL, and
+dbt**.
 
-This project demonstrates an end-to-end data engineering pipeline for collecting, staging, transforming, and analyzing airline fare data. It supports a fast **local demo environment** (Docker + Postgres) and a **production-style architecture** (AWS S3 + Redshift) orchestrated with Airflow and modeled with dbt.
+## Current Proven AWS Path
 
-Outputs include analytics-ready mart tables and example queries that support BI dashboards and pricing analysis workflows.
+![Current Proven AWS Path](docs/images/current-proven-aws-path.png)
 
-**AWS | Airflow | Python | SQL | dbt | Redshift (prod) | Postgres (local demo)**
+The ECS/Fargate batch container runs the data pipeline:
 
-An end-to-end, **Data Engineering** pipeline with an **Analytics + (optional) Data Science** layer.
+```text
+Flight API -> S3 Bronze -> Redshift Serverless -> dbt staging/marts/tests
+```
 
-- **DE core:** ingest -> bronze -> transform -> load -> dbt marts -> tests/docs -> orchestration
-- **DA layer:** example SQL queries + ready-to-chart mart tables
-- **DS optional:** simple "Buy vs Wait" baseline model trained from mart features
----
+The scheduled proof wraps that container with EventBridge Scheduler and
+CloudWatch Logs:
 
-## Quickstart (Local Demo in 10 Minutes)
+```text
+EventBridge Scheduler -> ECS / Fargate Batch Container -> Flight API Ingestion -> S3 Bronze -> Redshift Serverless -> dbt staging/marts/tests -> CloudWatch Logs
+```
 
-### Prereqs
-- Python 3.11.x (project baseline; matches CI and `pyproject.toml`)
-- Docker Desktop (running)
+## Proof at a Glance
+
+- Manual ECS/Fargate run completed with exit code `0`.
+- EventBridge Scheduler triggered ECS/Fargate.
+- CloudWatch logs showed `WEEK9_BATCH_SUCCESS`.
+- S3 Bronze ingestion, Redshift load, dbt build/tests, and mart verification
+  completed.
+- Daily EventBridge schedule was disabled after proof to avoid recurring AWS
+  cost.
+
+## What Recruiters Should Look At Fast
+
+- **Cloud DE proof:** Current Proven AWS Path, Proof at a Glance, Evidence,
+  and Runbooks.
+- **Implementation:** `scripts/run_aws_batch_pipeline.py`, `ingestion/`,
+  `warehouse/`, `sql/redshift/`, and `dbt/flight_fares/`.
+- **AWS templates:** `aws/*.template.json`; local filled files are intentionally
+  ignored.
+- **Analytics layer:** `dbt/flight_fares/models/marts/`, `sql/analysis/`, and
+  `analytics/`.
+- **Local demo:** Docker/Postgres/Airflow sections lower in this README.
+
+## Evidence
+
+| Proof | Screenshot |
+|---|---|
+| ECR image tag `week9` pushed | [01-ecr-pushed-image-tag.png](docs/screenshots/week9/01-ecr-pushed-image-tag.png) |
+| ECS cluster exists | [02-ecs-cluster.png](docs/screenshots/week9/02-ecs-cluster.png) |
+| ECS task definition revision | [03-ecs-task-definition-revision.png](docs/screenshots/week9/03-ecs-task-definition-revision.png) |
+| Manual Fargate task exit code `0` | [04-manual-fargate-task-exit-code-0.png](docs/screenshots/week9/04-manual-fargate-task-exit-code-0.png) |
+| Manual CloudWatch success log | [05-cloudwatch-manual-run-week9-success.png](docs/screenshots/week9/05-cloudwatch-manual-run-week9-success.png) |
+| EventBridge Scheduler enabled with ECS target | [06-eventbridge-scheduler-enabled-target.png](docs/screenshots/week9/06-eventbridge-scheduler-enabled-target.png) |
+| Scheduled CloudWatch success log | [07-cloudwatch-scheduled-run-week9-success.png](docs/screenshots/week9/07-cloudwatch-scheduled-run-week9-success.png) |
+| S3 Bronze prefix proof | [02-s3-bronze-prefix-view.png](docs/screenshots/week7/02-s3-bronze-prefix-view.png) |
+| S3 manifest proof | [05-manifest-output-proof.png](docs/screenshots/week7/05-manifest-output-proof.png) |
+| Redshift load success | [04-redshift-load-command-success.png](docs/screenshots/week8/04-redshift-load-command-success.png) |
+| Redshift raw proof queries | [05-redshift-raw-load-proof-queries.png](docs/screenshots/week8/05-redshift-raw-load-proof-queries.png) |
+| dbt Redshift debug success | [06-dbt-debug-redshift-success.png](docs/screenshots/week8/06-dbt-debug-redshift-success.png) |
+| dbt Redshift build/tests success | [07-dbt-build-redshift-success.png](docs/screenshots/week8/07-dbt-build-redshift-success.png) |
+| Redshift mart query proof | [08-redshift-mart-query-proof.png](docs/screenshots/week8/08-redshift-mart-query-proof.png) |
+
+## Runbooks
+
+- [Week 7: Real AWS Bronze S3 ingestion proof](docs/runbooks/week7_s3_bronze_ingestion.md)
+- [Week 8: S3 -> Redshift Serverless -> dbt proof](docs/runbooks/week8_redshift_warehouse_proof.md)
+- [Week 9: EventBridge Scheduler -> ECS/Fargate -> CloudWatch proof](docs/runbooks/week9_ecs_fargate_scheduler_proof.md)
+- [Architecture detail](docs/architecture.md)
+
+## Implemented vs Future Work
+
+Implemented:
+- Flight Fare API ingestion
+- S3 Bronze load
+- Redshift Serverless load
+- dbt staging / marts / tests
+- Docker batch runner
+- ECS / Fargate execution
+- EventBridge Scheduler trigger
+- CloudWatch logging
+- proof screenshots and runbooks
+
+Future Work:
+- Terraform / CloudFormation full IaC deployment
+- MWAA or production orchestration expansion
+- richer BI dashboard
+- ML / buy-vs-wait extension
+- monitoring and alerting improvements
+- production hardening
+
+## Cost and Secret Safety
+
+- The recurring daily EventBridge schedule was disabled after proof collection.
+- A one-time proof schedule was used for scheduled-run validation.
+- AWS resources can incur cost if left running.
+- Stop or delete unused ECS, ECR, CloudWatch, Redshift, and S3 resources when
+  they are no longer needed.
+- Local-only JSON files and secrets are ignored and should not be committed:
+  `.env`, `dbt/profiles.yml`, and `aws/*.local.json`.
+- Redshift password values are not committed; the ECS path uses Secrets Manager.
+
+## Why This Project
+
+Travel apps and planners struggle with "When should I book?" because fares
+change by route, lead time, seasonality, and volatility. This pipeline produces
+clean, tested tables that support route trends, price alerts, and buy/wait
+analysis.
+
+## Repo Structure
+
+- `ingestion/` - Flight API ingestion and S3/local Bronze writers
+- `warehouse/` - Redshift SQL runner and warehouse helpers
+- `sql/redshift/` - Redshift schemas, COPY SQL, proof queries, and mart checks
+- `dbt/flight_fares/` - dbt staging models, marts, tests, and macros
+- `scripts/run_aws_batch_pipeline.py` - ECS/Fargate batch entrypoint
+- `aws/` - AWS CLI templates; local filled JSON files are ignored
+- `docs/runbooks/` - proof runbooks for Weeks 7-9
+- `docs/screenshots/` - proof screenshots
+- `airflow/` - Local Demo orchestration only
+- `analytics/` and `ml/` - analytics outputs and optional modeling experiments
+
+## Local Demo / Conceptual Pipeline
+
+The local demo remains useful for development without AWS credentials. It uses
+Docker/Postgres/dbt locally and is secondary to the Current Proven AWS Path.
+
+![Local Demo / Conceptual Pipeline](docs/images/architecture_diagram.png)
+
+### Quickstart: Local Demo In 10 Minutes
+
+Prereqs:
+- Python 3.11.x
+- Docker Desktop
 - dbt 1.7.x (`dbt-core` + `dbt-postgres`, installed via `requirements.txt`)
 
-### 1) Clone + env
 ```bash
 git clone https://github.com/rihua-tech/cloud-flight-fare-pipeline.git
 cd cloud-flight-fare-pipeline
 python -m venv .venv
-
-# Windows PowerShell
-.venv\Scripts\Activate.ps1
-
 pip install -r requirements.txt
-```
-### 2) Start Postgres (Docker)
-```
 docker compose up -d
-```
-### 3) Load sample data into Postgres
-```
 python scripts/load_sample_to_postgres.py
-```
-### 4) Run dbt (staging + marts + tests)
-```
 dbt build --project-dir dbt/flight_fares --profiles-dir dbt
-```
-### 5) Run analysis queries (proof queries)
-```
-python scripts/run_analysis_queries.py
-```
-### Verify tables exist (optional)
-```
-docker exec -it cloud-flight-fare-pipeline-postgres-1 psql -U fare_user -d fare_db -c "\dt marts.*"
-```
-###### Note: `dbt/profiles.yml` is ignored (credentials). Use `dbt/profiles.example.yml` as a template and create your own local `dbt/profiles.yml`.
-
----
-
-## Why this project (business story)
-Travel apps and planners struggle with "**When should I book?**" because fares change by route, lead time, seasonality, and volatility.
-This pipeline produces clean, tested tables that support:
-- route/lead-time trends
-- price alerts
-- buy/wait recommendations
-
----
-
-## Architecture (high level)
-1) **Ingestion (Python):** API -> S3 (bronze) OR local filesystem demo  
-2) **Transform (Python or Spark):** bronze -> parquet (silver)  
-3) **Warehouse load (SQL/Python):** silver -> Redshift (prod) or Postgres (local)  
-4) **Modeling (dbt):** staging -> star schema marts (dim/fact) + tests + docs  
-5) **Analytics & DS:** example queries + optional baseline model
-
-See: `docs/architecture.md`
-
----
-
-## Repo structure
-- `ingestion/` - API ingestion (Python) + local demo mode
-- `transform/` - bronze -> silver transforms (pandas) + optional `spark_jobs/`
-- `warehouse/` - loaders + warehouse helpers (Postgres local / Redshift prod templates)
-- `sql/` - DDL + COPY templates + analysis queries
-- `dbt/flight_fares/` - staging + marts + tests + docs
-- `airflow/` - DAG outline (how you'd orchestrate in production)
-- `analytics/` - "proof" queries + quick EDA notes
-- `ml/` - optional baseline buy/wait model
-- `.github/workflows/` - GitHub Actions (lint + unit tests + dbt build)
-
----
-
-## Local demo (runs without AWS)
-### 0) Start Postgres
-```bash
-docker compose up -d postgres
-```
-
-### 1) Load sample data into `raw.fares`
-```bash
-pip install -r requirements.txt
-python scripts/load_sample_to_postgres.py
-```
-
-### 2) Run dbt build (models + tests)
-```bash
-cp dbt/profiles.example.yml dbt/profiles.yml
-dbt deps --project-dir dbt/flight_fares --profiles-dir dbt
-dbt build --project-dir dbt/flight_fares --profiles-dir dbt
-```
-
-### 3) Run example analytics queries
-```bash
 python scripts/run_analysis_queries.py
 ```
 
-### 4) (Optional) Train baseline model
+Note: `dbt/profiles.yml` is ignored because it can contain credentials. Use
+`dbt/profiles.example.yml` as a template for local development.
+
+### Local Airflow Demo
+
+Week 5 includes a local Airflow DAG for scheduled local demo runs and retry/log
+behavior. It is not the proven cloud orchestration path; the proven AWS trigger
+is EventBridge Scheduler.
+
 ```bash
-python ml/train_buy_wait.py
+docker compose -f airflow/docker-compose.airflow.yml up -d --build
 ```
 
----
+## Analytics-Ready Output
 
-## Production notes (AWS/Redshift)
-- Redshift DDL/COPY templates: `sql/redshift/`
-- Redshift dbt target setup (example only): `warehouse/redshift_dbt.md`
-- Proof row counts after dbt: `sql/redshift/verify_marts.sql`
-- Airflow DAG outline: `airflow/dags/flight_fare_pipeline_dag.py`
-- Replace the local demo loader with:
-  - API -> S3 ingestion
-  - Redshift COPY from S3
-  - dbt runs in a job container / MWAA
+Primary mart tables:
+- `marts.fact_fares`
+- `marts.dim_route`
+- `marts.dim_date`
 
----
+Supporting documentation:
+- `docs/how_to_use_marts.md`
+- `docs/data_dictionary.md`
+- `docs/kpi_definitions.md`
 
+Dashboard preview:
+- [docs/images/dashboard_screenshot.png](docs/images/dashboard_screenshot.png)
+
+![Dashboard screenshot](docs/images/dashboard_screenshot.png)
+
+<details>
+<summary>Historical Milestone Details: Weeks 3–6</summary>
 
 ## Week 3 - S3 Bronze Ingestion
 
@@ -181,7 +217,6 @@ Real examples (3 days):
 - `s3://cloud-flight-fare-pipeline-rihua-2026-east1/bronze/dt=2026-01-24/fares.csv`
 
 ### Evidence (screenshots)
- (screenshots)
 
 **Terminal output**
 ![Terminal upload](docs/screenshots/week3/terminal-upload.png)
@@ -189,11 +224,6 @@ Real examples (3 days):
 **S3 console folders**
 ![S3 console](docs/screenshots/week3/s3-console.png)
 
-
-## What recruiters should look at (fast)
-- **DE:** `ingestion/`, `warehouse/`, `dbt/`, `sql/redshift/`, `.github/workflows/`
-- **DA:** `dbt/.../marts/` + `sql/analysis/` + `analytics/`
-- **DS:** `ml/` + feature query in `sql/analysis/buy_wait_features.sql`
 
 ## Week 4 - Warehouse Target (Summary)
 
@@ -413,6 +443,8 @@ Supporting documentation:
 
 ---
 
+</details>
+
 ## Real AWS Bronze S3 Ingestion Proof (Week 7)
 
 Week 7 promotes Bronze ingestion to a clear real AWS S3 proof path while keeping
@@ -516,7 +548,7 @@ Full runbook: [docs/runbooks/week8_redshift_warehouse_proof.md](docs/runbooks/we
 Week 9 proves the scheduled AWS batch execution path:
 
 ```text
-EventBridge Scheduler -> ECS/Fargate -> Docker batch runner -> CloudWatch Logs
+EventBridge Scheduler -> ECS / Fargate Batch Container -> Flight API Ingestion -> S3 Bronze -> Redshift Serverless -> dbt staging/marts/tests -> CloudWatch Logs
 ```
 
 Implemented in this repo:
@@ -567,4 +599,12 @@ Expected proof screenshots:
 
 Full runbook: [docs/runbooks/week9_ecs_fargate_scheduler_proof.md](docs/runbooks/week9_ecs_fargate_scheduler_proof.md)
 
----
+## Week 10 Documentation Closeout
+
+Week 10 closes out the repository as a recruiter-ready AWS cloud data
+engineering proof story. The README leads with the Current Proven AWS Path,
+evidence screenshots, runbooks, implemented vs future work, and cost/secret
+safety notes.
+
+This closeout does not add new AWS infrastructure. It documents the completed
+Week 7-9 proof path and makes the project easier to review quickly.

@@ -1,52 +1,102 @@
 # Architecture
 
-## Overview
-This project builds a flight fare data pipeline that supports both a **local demo workflow** (Postgres + dbt) and a **production-oriented cloud design** (AWS/Redshift). The goal is to produce analytics-ready marts for reporting, ad-hoc querying, and downstream modeling.
+## Current Proven AWS Path
 
-Core marts in this repo:
-- `marts.fact_fares`
-- `marts.dim_route`
-- `marts.dim_date`
+This repo's proven cloud path is:
 
-## Local Demo Flow (Postgres + dbt)
-The local path is intentionally runnable without AWS credentials.
+```text
+EventBridge Scheduler -> ECS / Fargate Batch Container -> Flight API Ingestion -> S3 Bronze -> Redshift Serverless -> dbt staging/marts/tests -> CloudWatch Logs
+```
 
-Execution flow:
-1. Start local Postgres:
-   - `docker compose up -d postgres`
-2. Load sample data into `raw.fares`:
-   - `python scripts/load_sample_to_postgres.py`
-3. Build dbt staging + marts + tests:
-   - `dbt build --project-dir dbt/flight_fares --profiles-dir dbt`
-4. Run analysis SQL and write CSV outputs:
-   - `python scripts/run_analysis_queries.py`
+![Current Proven AWS Path](images/current-proven-aws-path.png)
 
-Data movement (local):
-- `data/sample/fares_sample.csv` (or latest `data/bronze/dt=*/fares.csv`)
-- `raw.fares` -> `staging` (`stg_fares`) -> `marts.fact_fares`, `marts.dim_route`, `marts.dim_date`
-- analytics outputs written to `analytics/outputs/`
+What was actually validated:
 
-## Production Flow (AWS/Redshift + orchestration)
-The production-oriented path keeps the same logical model while changing infrastructure.
+- EventBridge Scheduler triggered an ECS/Fargate task.
+- ECS/Fargate ran the Docker batch container.
+- The batch container ingested fare data into S3 Bronze.
+- Redshift Serverless loaded Bronze CSV data into `raw.fares`.
+- dbt built Redshift staging and mart models and ran tests.
+- Mart verification completed.
+- CloudWatch Logs showed `WEEK9_BATCH_SUCCESS` for manual and scheduled runs.
 
-Typical flow:
-1. Ingest API snapshots to S3 bronze partitions:
-   - `python -m ingestion.ingest_api_to_s3 --mode s3 --start YYYY-MM-DD --days N`
-2. Load bronze files into Redshift raw schema:
-   - `python warehouse/run_redshift_sql.py`
-3. Build dbt models/tests in Redshift:
-   - `dbt build --project-dir dbt/flight_fares --profiles-dir dbt -t redshift`
-4. Orchestrate the sequence with Airflow (local DAG in repo; MWAA-compatible pattern):
-   - `airflow/dags/flight_fare_pipeline_dag.py`
+## Batch Container Flow
+
+The batch container is the execution unit for the proven AWS path:
+
+```text
+Flight API -> S3 Bronze -> Redshift Serverless -> dbt staging/marts/tests
+```
+
+The container entrypoint is `scripts/run_aws_batch_pipeline.py`. It composes the
+existing project commands instead of duplicating business logic:
+
+- `python -m ingestion.ingest_api_to_s3 --mode s3`
+- `python warehouse/run_redshift_sql.py`
+- `dbt deps` and `dbt build` against the Redshift target
+- `python warehouse/run_redshift_sql.py --files verify_marts.sql`
+
+The dbt profile is generated at runtime from environment variables. Redshift
+passwords are supplied through ECS Secrets Manager and are not committed.
+
+## AWS Services Used
+
+| Service | Role in the proven path |
+|---|---|
+| EventBridge Scheduler | Triggers the ECS/Fargate task |
+| ECS / Fargate | Runs the Dockerized batch job |
+| ECR | Stores the `week9` batch image |
+| S3 | Stores partitioned Bronze CSV data |
+| Redshift Serverless | Hosts raw, staging, and mart schemas |
+| Secrets Manager | Supplies the Redshift password to ECS |
+| CloudWatch Logs | Captures batch run logs and success markers |
 
 ## Data Model / Marts
+
 | Mart | Grain | Main Use |
 |---|---|---|
-| `marts.fact_fares` | One observed fare per `snapshot_date`, `origin`, `dest`, `depart_date` (plus provider/class attributes when available) | KPI calculations: avg fare, min fare, lead-time and weekday/weekend analysis |
-| `marts.dim_route` | One row per route (`origin`, `dest`) | Route slicing and route labels (`route_key`) |
-| `marts.dim_date` | One row per snapshot date (`date_day`) | Calendar slicing (`day_of_week`, `month`, `year`) |
+| `marts.fact_fares` | One observed fare per `snapshot_date`, `origin`, `dest`, and `depart_date` | Average fare, minimum fare, lead-time analysis, weekday/weekend analysis |
+| `marts.dim_route` | One row per route (`origin`, `dest`) | Route slicing and route labels |
+| `marts.dim_date` | One row per date | Calendar slicing by day, month, and year |
 
-## Architecture Diagram
-Reference artifact: `docs/images/architecture_diagram.png`
+## Local Demo
 
-![Architecture diagram](images/architecture_diagram.png)
+The Local Demo is a development path that runs without AWS credentials. It is
+secondary to the Current Proven AWS Path.
+
+Execution flow:
+
+```text
+Local CSV/sample data -> local Postgres raw.fares -> dbt staging/marts/tests -> local analysis outputs
+```
+
+Run locally:
+
+```bash
+docker compose up -d postgres
+python scripts/load_sample_to_postgres.py
+dbt build --project-dir dbt/flight_fares --profiles-dir dbt
+python scripts/run_analysis_queries.py
+```
+
+Reference conceptual diagram:
+
+![Local Demo / Conceptual Pipeline](images/architecture_diagram.png)
+
+## Future Work
+
+These are intentionally listed as future work, not completed cloud proof:
+
+- Terraform / CloudFormation full IaC deployment
+- MWAA or broader production orchestration expansion
+- richer BI dashboard
+- ML / buy-vs-wait extension
+- monitoring and alerting improvements
+- production hardening
+
+## Proof Runbooks
+
+- [Week 7: Real AWS Bronze S3 ingestion proof](runbooks/week7_s3_bronze_ingestion.md)
+- [Week 8: S3 -> Redshift Serverless -> dbt proof](runbooks/week8_redshift_warehouse_proof.md)
+- [Week 9: EventBridge Scheduler -> ECS/Fargate -> CloudWatch proof](runbooks/week9_ecs_fargate_scheduler_proof.md)
+
