@@ -1,7 +1,7 @@
 [project]
 name = "cloud-flight-fare-pipeline"
 version = "0.1.0"
-description = "Cloud Flight Fare Pipeline (AWS, Airflow, dbt, Redshift) - starter skeleton"
+description = "End-to-end AWS flight fare data pipeline with ECS/Fargate, S3, Redshift Serverless, dbt, EventBridge Scheduler, and CloudWatch proof"
 requires-python = ">=3.11,<3.12"
 dependencies = []
 
