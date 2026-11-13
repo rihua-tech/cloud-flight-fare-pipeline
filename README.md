@@ -132,7 +132,7 @@ analysis.
 - `docs/runbooks/` - proof runbooks for Weeks 7-9
 - `docs/screenshots/` - proof screenshots
 - `airflow/` - Local Demo orchestration only
-- `analytics/` and `ml/` - analytics outputs and optional modeling experiments
+- `analytics/` - analytics outputs
 
 ## Local Demo / Conceptual Pipeline
 

@@ -28,4 +28,4 @@ test:
 	pytest -q
 
 demo: up setup load dbt-build analyze
-	@echo "Demo complete. Optional: python ml/train_buy_wait.py"
+	@echo "Demo complete."
