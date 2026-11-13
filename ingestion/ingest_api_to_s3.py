@@ -3,7 +3,7 @@ import csv
 import io
 import json
 from dataclasses import asdict, dataclass
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Literal
 
@@ -43,7 +43,7 @@ class PartitionResult:
 
 
 def utc_now_iso_z() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def s3_key_for_date(run_date: str, prefix: str | None = None) -> str:
@@ -310,7 +310,7 @@ def main() -> None:
     elif args.date:
         run_dates = [args.date]
     else:
-        run_dates = [str(date.today())]
+        run_dates = [str(date.today())]  # noqa: DTZ011 -- Preserve local default run date.
 
     run_timestamp = utc_now_iso_z()
     s3_client = None

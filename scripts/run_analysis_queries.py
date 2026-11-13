@@ -5,8 +5,8 @@ Assumes dbt build has created marts.fact_fares and dims.
 Run:
   python scripts/run_analysis_queries.py
 """
-import os
 import csv
+import os
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -64,7 +64,7 @@ def main() -> None:
             path = ANALYSIS_DIR / filename
             try:
                 run_file(conn, path, OUTPUT_DIR)
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001 -- Keep per-query failure reporting.
                 print(f"FAILED: {path.name} -> {exc}")
                 failed_queries.append(path.name)
 

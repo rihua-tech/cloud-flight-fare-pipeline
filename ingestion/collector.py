@@ -6,13 +6,11 @@ import csv
 import os
 import time
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
-from typing import Optional, Tuple
 
 import requests
 from dotenv import load_dotenv
-
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Paths + env
@@ -34,17 +32,17 @@ class Config:
     sleep_between_calls_sec: float = 0.2
 
     # ✅ Prefer AIRPORT IATA codes (more reliable than city codes like TYO)
-    origins: Tuple[str, ...] = ("JFK", "LAX", "SFO", "ATL", "ORD")
-    dests: Tuple[str, ...] = ("LHR", "CDG", "DXB", "HND", "SIN")
+    origins: tuple[str, ...] = ("JFK", "LAX", "SFO", "ATL", "ORD")
+    dests: tuple[str, ...] = ("LHR", "CDG", "DXB", "HND", "SIN")
 
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Helpers
 def utc_now_iso_z() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
-def split_codes(s: str) -> Tuple[str, ...]:
+def split_codes(s: str) -> tuple[str, ...]:
     codes = [c.strip().upper() for c in s.split(",") if c.strip()]
     return tuple(codes)
 
@@ -55,11 +53,11 @@ def safe_int(v) -> str:
         return ""
     try:
         return str(int(v))
-    except Exception:
+    except Exception:  # noqa: BLE001 -- Invalid values intentionally become empty strings.
         return ""
 
 
-def parse_depart_date(raw: str) -> Optional[date]:
+def parse_depart_date(raw: str) -> date | None:
     if not raw:
         return None
     raw = raw.strip()
@@ -68,11 +66,13 @@ def parse_depart_date(raw: str) -> Optional[date]:
         s = raw.replace("Z", "+00:00")
         dt = datetime.fromisoformat(s)
         return dt.date()
-    except Exception:
+    except Exception:  # noqa: BLE001 -- Any ISO parse failure uses the fallback parser.
         # fallback to date-only
         try:
-            return datetime.strptime(raw[:10], "%Y-%m-%d").date()
-        except Exception:
+            return datetime.strptime(  # noqa: DTZ007 -- Preserve date-only parsing.
+                raw[:10], "%Y-%m-%d"
+            ).date()
+        except Exception:  # noqa: BLE001 -- Invalid dates intentionally return None.
             return None
 
 
@@ -97,7 +97,7 @@ def fetch_latest_prices(cfg: Config, origin: str, dest: str, session: requests.S
         "token": cfg.api_key,
     }
 
-    last_err: Optional[Exception] = None
+    last_err: Exception | None = None
     for attempt in range(1, cfg.max_retries + 1):
         try:
             resp = session.get(url, params=params, timeout=cfg.timeout_sec)
@@ -112,7 +112,7 @@ def fetch_latest_prices(cfg: Config, origin: str, dest: str, session: requests.S
             resp.raise_for_status()
             return resp.json()
 
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 -- Retry all API and response decoding failures.
             last_err = e
             time.sleep(0.8 * attempt)
 
@@ -122,9 +122,11 @@ def fetch_latest_prices(cfg: Config, origin: str, dest: str, session: requests.S
 # ──────────────────────────────────────────────────────────────────────────────
 # Bronze writer
 def write_bronze_snapshot(cfg: Config) -> Path:
-    snapshot_date = date.today().isoformat()
+    snapshot_date = date.today().isoformat()  # noqa: DTZ011 -- Preserve local partition date.
     scrape_ts = utc_now_iso_z()
-    cutoff = date.today() + timedelta(days=cfg.days_ahead)
+    cutoff = date.today() + timedelta(  # noqa: DTZ011 -- Preserve local cutoff date.
+        days=cfg.days_ahead
+    )
 
     out_dir = REPO_ROOT / "data" / "bronze" / f"dt={snapshot_date}"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -191,7 +193,7 @@ def write_bronze_snapshot(cfg: Config) -> Path:
                         ])
                         written += 1
 
-                except Exception as e:
+                except Exception as e:  # noqa: BLE001 -- Keep per-route failure isolation.
                     warns += 1
                     print(f"[WARN] {origin}->{dest}: {e}")
 

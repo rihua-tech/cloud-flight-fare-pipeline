@@ -1,5 +1,7 @@
 import pandas as pd
+
 from transform.validate_silver import validate_df
+
 
 def test_validation_fails_missing_required_columns():
     df = pd.DataFrame({"origin": ["JFK"], "dest": ["LAX"]})

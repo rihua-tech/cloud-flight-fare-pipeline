@@ -10,11 +10,11 @@ import os
 import subprocess
 import sys
 import tempfile
+from collections.abc import Mapping
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from textwrap import dedent
-from typing import Mapping
 
 from dotenv import load_dotenv
 
@@ -39,7 +39,7 @@ class BatchConfig:
 
 
 def utc_today() -> str:
-    return datetime.now(timezone.utc).date().isoformat()
+    return datetime.now(UTC).date().isoformat()
 
 
 def env_bool(value: str | None, default: bool) -> bool:
