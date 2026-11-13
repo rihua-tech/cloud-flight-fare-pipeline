@@ -37,7 +37,7 @@ def build_s3_copy_uri(bucket: str | None, prefix: str | None) -> str | None:
     if not clean_prefix:
         return None
 
-    if clean_prefix.endswith(".csv") or clean_prefix.endswith("="):
+    if clean_prefix.endswith((".csv", "=")):
         return f"s3://{bucket}/{clean_prefix}"
 
     if re.search(r"(^|/)dt=\d{4}-\d{2}-\d{2}$", clean_prefix):
@@ -165,7 +165,7 @@ def main() -> int:
     # Only require psycopg2 + connection env vars when executing
     try:
         import psycopg2  # type: ignore
-    except Exception:
+    except Exception:  # noqa: BLE001 -- Preserve friendly handling of any import failure.
         print("ERROR: psycopg2 is not installed. Run: pip install psycopg2-binary")
         return 1
 
@@ -181,7 +181,7 @@ def main() -> int:
             try:
                 execute_sql(conn, sql)
                 print(f"SUCCESS: {path}")
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001 -- Keep per-statement failure reporting.
                 print(f"FAILED: {path} -> {exc}")
                 had_failure = True
 

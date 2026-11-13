@@ -31,8 +31,7 @@ def test_analysis_runner_exits_non_zero_when_any_query_fails():
 
     with patch.object(runner, "create_engine", return_value=_DummyEngine()), patch.object(
         runner, "run_file", side_effect=fake_run_file
-    ):
-        with pytest.raises(SystemExit) as exc:
-            runner.main()
+    ), pytest.raises(SystemExit) as exc:
+        runner.main()
 
     assert exc.value.code == 1

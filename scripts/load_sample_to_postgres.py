@@ -13,7 +13,8 @@ from pathlib import Path
 import pandas as pd
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
-from sqlalchemy.types import Date, Integer, Numeric, TIMESTAMP, Text as SqlText
+from sqlalchemy.types import TIMESTAMP, Date, Integer, Numeric
+from sqlalchemy.types import Text as SqlText
 
 ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT / ".env")  # load repo .env reliably

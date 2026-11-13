@@ -2,12 +2,13 @@
 from __future__ import annotations
 
 import argparse
+from datetime import UTC, datetime
 from pathlib import Path
-from datetime import datetime, timezone
 
 import pandas as pd
 
 from transform.contract import REQUIRED_COLUMNS
+
 
 def _standardize_columns(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
@@ -51,7 +52,7 @@ def _clean_and_cast(df: pd.DataFrame) -> pd.DataFrame:
         df = df.drop_duplicates(subset=dedupe_cols, keep="last")
 
     # Add load timestamp (freshness)
-    df["load_ts"] = datetime.now(timezone.utc)
+    df["load_ts"] = datetime.now(UTC)
 
     return df
 

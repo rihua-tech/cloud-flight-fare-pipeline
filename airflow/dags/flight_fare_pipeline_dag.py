@@ -13,8 +13,9 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 
-from airflow import DAG
 from airflow.operators.bash import BashOperator
+
+from airflow import DAG
 
 PROJECT_DIR = "/opt/airflow/project"
 
@@ -31,7 +32,7 @@ with DAG(
     dag_id="flight_fare_pipeline_local_demo",
     description="Local demo: load sample -> dbt build -> proof queries (Week 5 Airflow orchestration)",
     default_args=default_args,
-    start_date=datetime(2026, 1, 1),
+    start_date=datetime(2026, 1, 1),  # noqa: DTZ001 -- Preserve naive Airflow schedule.
     schedule="@daily",
     catchup=False,
     max_active_runs=1,

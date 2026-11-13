@@ -7,7 +7,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from transform.contract import REQUIRED_COLUMNS, NULL_THRESHOLDS, ACCEPTED_CABIN
+from transform.contract import ACCEPTED_CABIN, NULL_THRESHOLDS, REQUIRED_COLUMNS
+
 
 def validate_df(df: pd.DataFrame) -> dict:
     issues = []
@@ -41,8 +42,8 @@ def validate_df(df: pd.DataFrame) -> dict:
             issues.append(f"invalid_cabin_values: {bad_vals[:10]}")
 
     return {
-        "rows": int(len(df)),
-        "cols": int(len(df.columns)),
+        "rows": len(df),
+        "cols": len(df.columns),
         "issues": issues,
         "ok": len(issues) == 0,
     }

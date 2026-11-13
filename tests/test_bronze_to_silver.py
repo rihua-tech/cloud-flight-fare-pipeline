@@ -1,5 +1,7 @@
 import pandas as pd
-from transform.bronze_to_silver import _standardize_columns, _clean_and_cast
+
+from transform.bronze_to_silver import _clean_and_cast, _standardize_columns
+
 
 def test_bronze_to_silver_adds_load_ts_and_cleans():
     raw = pd.DataFrame({
